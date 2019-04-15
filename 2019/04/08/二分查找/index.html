@@ -97,7 +97,7 @@
   }
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">二分查找</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-04-08</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="查找算法"> 查找算法</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1.1k</span> | Reading time: <span class="post-count">4</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这篇文章所要讲的二分查找，是一种效率很高的查找方法。二分查找可以将查找的时间复杂度降至<em>O(log2n)</em>，但是它要求所查找的数列至少是有序数列。在大部分题目中，这个数列会被规定为有序且连续，但在某些题目中，数列不是连续的，而如果无法查找到，则输出固定语句。这些大同小异，但是用二分查找的前提一定是该数列有序。 </p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">二分查找</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-04-08</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="查找算法"> 查找算法</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1.3k</span> | Reading time: <span class="post-count">5</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这篇文章所要讲的二分查找，是一种效率很高的查找方法。二分查找可以将查找的时间复杂度降至<em>O(log2n)</em>，但是它要求所查找的数列至少是有序数列。在大部分题目中，这个数列会被规定为有序且连续，但在某些题目中，数列不是连续的，而如果无法查找到，则输出固定语句。这些大同小异，但是用二分查找的前提一定是该数列有序。 </p>
 <a id="more"></a>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="具体示例"><a href="#具体示例" class="headerlink" title="具体示例"></a>具体示例</h2><p>当我们在电话本中查找我们想要的人的电话号码时，我们通常知道想要查找的人的姓名，而电话本中记录的顺序完全按照姓名字母的字典序。我们通常如何查找？</p>
 <p>先翻到电话本的一半，判断一半时候的姓名字母是在目标姓名字母的前边还是后边，然后再在目标姓名字母存在的部分继续上述过程，最终可以查到目标电话号码，这就是二分查找的具体应用之一。</p>
@@ -159,7 +159,83 @@ int main()
 <h3 id="查找最接近的元素–openjudge-noi"><a href="#查找最接近的元素–openjudge-noi" class="headerlink" title="查找最接近的元素–openjudge-noi"></a>查找最接近的元素–openjudge-noi</h3><p><a href="http://noi.openjudge.cn/ch0111/01/" title="openjudge-noi1" target="_blank" rel="noopener">http://noi.openjudge.cn/ch0111/01/</a></p>
 <p><img src="https://www.z4a.net/images/2019/04/12/4.2.jpg" alt="二分查找4.1.jpg"></p>
 <p>基本是道裸二分查找，没啥好说的……</p>
-<h3 id="二分法求函数的零点–openjudge-noi"><a href="#二分法求函数的零点–openjudge-noi" class="headerlink" title="二分法求函数的零点–openjudge-noi"></a>二分法求函数的零点–openjudge-noi</h3><p><a href="http://noi.openjudge.cn/ch0111/02/" title="openjudge-noi2" target="_blank" rel="noopener">http://noi.openjudge.cn/ch0111/02/</a></p>
+<p>打出了ac代码，emmm我代码风格也不好，各人有各人的作法……</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int a[100005]={-1};
+int l,r;
+int n,m,t;
+int i;
+int mid,ans,ans1;
+int jdz(int cs)
+{
+    if(cs&lt;0)
+    {
+        return -cs;
+    }
+    else
+    {
+        return cs;
+    }
+} 
+int bj(int a1,int a2,int p)
+{
+    if(a1==-1)
+    {
+        a1=-999;
+    }
+    if(a2==-1)
+    {
+        a2=-999;
+    }
+    if(jdz(a1-p)&lt;=jdz(a2-p))
+    {
+        return a1;
+    }
+    else
+    {
+        return a2;
+    }
+}
+int cz(int q)
+{    
+    l=1;
+    r=n;
+    while(l&lt;=r)
+    {
+        mid=(l+r)/2;
+        if(a[mid]&lt;=q)
+        {
+            l=mid+1;
+        }
+        else
+        {
+            r=mid-1;
+        }
+    }
+    mid=(l+r)/2;
+    ans1=bj(a[mid],a[mid+1],q);
+    a[0]=-1;
+    a[n+1]=-1;
+    return ans1;
+}
+int main()
+{
+    scanf(&quot;%d&quot;,&amp;n);
+    for(i=1;i&lt;=n;i++)
+    {
+        scanf(&quot;%d&quot;,&amp;a[i]);
+    }
+    scanf(&quot;%d&quot;,&amp;m);
+    for(i=1;i&lt;=m;i++)
+    {
+        scanf(&quot;%d&quot;,&amp;t);
+        ans=cz(t);
+        printf(&quot;%d\n&quot;,ans);
+    }
+    return 0;
+} 
+</code></pre><h3 id="二分法求函数的零点–openjudge-noi"><a href="#二分法求函数的零点–openjudge-noi" class="headerlink" title="二分法求函数的零点–openjudge-noi"></a>二分法求函数的零点–openjudge-noi</h3><p><a href="http://noi.openjudge.cn/ch0111/02/" title="openjudge-noi2" target="_blank" rel="noopener">http://noi.openjudge.cn/ch0111/02/</a></p>
 <p><img src="https://www.z4a.net/images/2019/04/12/4.3.jpg" alt="二分查找4.3.jpg"></p>
 <p>也是道裸二分查找，跟上面那题难度相差不多，也就是个精度问题。</p>
 <h3 id="x的平方根–leetcode（力扣网）"><a href="#x的平方根–leetcode（力扣网）" class="headerlink" title="x的平方根–leetcode（力扣网）"></a>x的平方根–leetcode（力扣网）</h3><p><a href="https://leetcode-cn.com/problems/sqrtx/" title="力扣网" target="_blank" rel="noopener">https://leetcode-cn.com/problems/sqrtx/</a></p>
