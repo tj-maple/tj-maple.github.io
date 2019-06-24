@@ -97,7 +97,7 @@
   }
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//leo-cat.github.io" target="_black">BlackBlood</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">dfs习题讲解</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-04-26</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="dfs"> dfs</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2.7k</span> | Reading time: <span class="post-count">10</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究会崩。</p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//leo-cat.github.io" target="_black">BlackBlood</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">dfs习题讲解</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-04-26</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="dfs"> dfs</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">3.7k</span> | Reading time: <span class="post-count">14</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究会崩。</p>
 <a id="more"></a>
 <p>在这篇博客中我将根据具体例题讲解部分dfs思路，正如上面所说，思想和实现能力是相辅相成的，我在这里理清了思路，还需要进行一个系列题目的练习，才能说把思路巩固了。如果有能力再进行高级的练习以及对于题目变形的解答。我希望在讲解的过程中也可以教学相长，如有错漏还请不吝赐教。</p>
 <h1 id="正文（例题）"><a href="#正文（例题）" class="headerlink" title="正文（例题）"></a>正文（例题）</h1><h2 id="hdu-2553-N皇后问题"><a href="#hdu-2553-N皇后问题" class="headerlink" title="hdu 2553 N皇后问题"></a>hdu 2553 N皇后问题</h2><p>n皇后问题就是最经典的dfs问题，一般的n皇后问题主要求解的是解的个数或者摆放的位置图。</p>
@@ -187,7 +187,7 @@ int main()
     return 0;
 }
 </code></pre><p>其中某些地方可以进行优化来缩减空间或者时间，但由于高中这么学的，所以在此就不作多少改动了。</p>
-<h2 id="洛谷-P1605"><a href="#洛谷-P1605" class="headerlink" title="洛谷 P1605"></a>洛谷 P1605</h2><p>一个简单的裸dfs问题，当然用bfs也能做。</p>
+<h2 id="洛谷-P1605-迷宫"><a href="#洛谷-P1605-迷宫" class="headerlink" title="洛谷 P1605 迷宫"></a>洛谷 P1605 迷宫</h2><p>一个简单的裸dfs问题，当然用bfs也能做。</p>
 <h3 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h3><p><img src="https://www.z4a.net/images/2019/05/29/dfs-2.1.jpg" alt="dfs-2.1.jpg"></p>
 <h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>下面我随便给出一组数据(题目样例给的太简单了……)来作图进行解释。</p>
 <p>作图如下</p>
@@ -269,7 +269,7 @@ int main()
     printf(&quot;%d&quot;,sum);
     return 0;
 }
-</code></pre><h2 id="洛谷P1706-全排列问题"><a href="#洛谷P1706-全排列问题" class="headerlink" title="洛谷P1706 全排列问题"></a>洛谷P1706 全排列问题</h2><p>比较经典的问题，没啥好解释的，特别注意的也就是输出格式。</p>
+</code></pre><h2 id="洛谷-P1706-全排列问题"><a href="#洛谷-P1706-全排列问题" class="headerlink" title="洛谷 P1706 全排列问题"></a>洛谷 P1706 全排列问题</h2><p>比较经典的问题，没啥好解释的，特别注意的也就是输出格式。</p>
 <h3 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h3><p><img src="https://www.z4a.net/images/2019/06/04/dfs-3.1.jpg" alt="dfs-3.1.jpg"></p>
 <h3 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h3><p>输出自然数1到n所有不重复的排列，用我们的思维方式，很容易看出可以用dfs来解。</p>
 <p>我们在此将第k次选择的数字，作为第k层的数字。以输入样例即3为例：每层都有三个可选项(1,2,3)，但是条件是已经选过的数字不可以再次选中，我们便可以用数组记录是否已经选中。</p>
@@ -312,5 +312,129 @@ int main()
     dfs(1);
     return 0;
 }
-</code></pre><p>## </p>
-</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://www.maple0321.club">Maple</a></p><p> <span>Link:  </span><a href="https://www.maple0321.club/2019/04/26/dfs习题讲解/">https://www.maple0321.club/2019/04/26/dfs习题讲解/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2019/04/11/个人常用OJ平台/" title="个人常用OJ平台"><span>NextPost ></span><br><span class="nextTitle">个人常用OJ平台</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#正文（例题）"><span class="toc-number">2.</span> <span class="toc-text">正文（例题）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hdu-2553-N皇后问题"><span class="toc-number">2.1.</span> <span class="toc-text">hdu 2553 N皇后问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目"><span class="toc-number">2.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路"><span class="toc-number">2.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码"><span class="toc-number">2.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1605"><span class="toc-number">2.2.</span> <span class="toc-text">洛谷 P1605</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷P1706-全排列问题"><span class="toc-number">2.3.</span> <span class="toc-text">洛谷P1706 全排列问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-2"><span class="toc-number">2.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
+</code></pre><h2 id="洛谷-P1036-选数"><a href="#洛谷-P1036-选数" class="headerlink" title="洛谷 P1036 选数"></a>洛谷 P1036 选数</h2><h3 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h3><p><img src="https://www.z4a.net/images/2019/06/20/dfs-5.1.jpg" alt="dfs-5.1.jpg"></p>
+<h3 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h3><p>很明显，这道题是一道组合，按照我们正常的思维方式，自然能够想到dfs的解题思路。限界条件就是已选择的数字个数等于要求选择的数字个数。</p>
+<p>以题目中所给数据为例，我们把第几个选择的数字当作第几层。如此，第一层我们首先选择第一个数字即3，然后第二层选择3之后的第一个数字即7，第三层选择12。已经选择了三个数字，进行判定，3+7+12=22，22不是一个素数，故总数不变。</p>
+<p>判定结束后，第三层重新选择，选择当前数字即12的下一个数字19。进行判定，3+7+19=29是一个素数，故总数加一。这时第三层应该重新选择，但是19后面没有数字了，故第三层回溯到第二层，第二层进行重新选择，第二层选择了下一个数字即12，第三层选择19。3+12+19=38，38不是一个素数。</p>
+<p>第三层无法重新选择，回溯第二层，第二层重新选择到了19，第三层又没数可选，故回溯到第二层，回溯到第一层，第一层选择下一个数字即7，第二层是12，第三层是19。7+12+19=34，不是一个素数。之后无情况出现，第一层无法选择，dfs结束。</p>
+<h3 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int n,k;
+int a[25];
+int sum=0,sum1=0;
+int pd(int shu)
+{
+    int i;
+    for(i=2;i&lt;=sqrt(shu);i++)
+    {
+        if(shu%i==0)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+void dfs(int ceng,int ge)
+{
+    if(ceng==k)
+    {
+        sum+=a[ge];
+        if(pd(sum)==1)
+        {
+            sum1++;
+        }
+        sum-=a[ge];
+        return;
+    }
+    else
+    {
+        sum+=a[ge];
+        for(int j=ge+1;j&lt;=n;j++)
+        {
+            dfs(ceng+1,j);
+        }
+        sum-=a[ge];
+    }
+}
+int main()
+{
+    int i;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+    for(i=1;i&lt;=n;i++)
+    {
+        scanf(&quot;%d&quot;,&amp;a[i]);
+    }
+    for(i=1;i&lt;=n;i++)
+    {
+        dfs(1,i);
+    }
+    printf(&quot;%d&quot;,sum1);
+    return 0;
+}
+</code></pre><h2 id="洛谷-AT1350-深さ優先探索"><a href="#洛谷-AT1350-深さ優先探索" class="headerlink" title="洛谷 AT1350 深さ優先探索"></a>洛谷 AT1350 深さ優先探索</h2><h3 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h3><p><img src="https://s2.ax1x.com/2019/06/22/ZplZ0e.jpg" alt="dfs-6.1.jpg"></p>
+<h3 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h3><p>题目问高桥先生能否到达鱼店，很明显是一个地图类的搜索。地图类的搜索我也在上面的迷宫中讲过。这类题用dfs和bfs都可以，但是由于dfs代码编写简单，故我在此用dfs解题。</p>
+<p>迷宫一题问有多少种方案，而这个题目问是否能够到达。这就是两个题目最大的区别，这个区别体现在已经回溯过的点是否有必要再次经过。对于这种是否连通的题目，已经回溯过的点确实可以再次经过，但该点衍生出的路径均已被证伪（若可以通向终点则已经跳出了搜索过程），所以再次对于该点的操作都是浪费时间。故我们可以记录每一个点是否已经经过。这种去掉无用操作的技巧叫做剪枝。</p>
+<p>通过剪枝，我们可以大幅降低时间复杂度，在某些题目中，不剪枝会导致TLE（超时）。</p>
+<h3 id="代码-4"><a href="#代码-4" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int jl=0;
+char a[505][505];
+int b[505][505]={0};
+int n,m;
+int xa[6]={1,-1,0,0};
+int ya[6]={0,0,1,-1};
+void dfs(int x,int y)
+{
+    if(a[x][y]==&apos;g&apos;)
+    {
+        jl=1;
+    }
+    else if(x==0||x==n+1||y==-1||y==m||a[x][y]==&apos;#&apos;)
+    {
+        return;
+    }
+    else
+    {
+        for(int k=0;k&lt;=3;k++)
+        {
+            if(b[x+xa[k]][y+ya[k]]==0)
+            {
+                b[x+xa[k]][y+ya[k]]=1;
+                dfs(x+xa[k],y+ya[k]);
+            }
+        }
+    }
+}
+int main()
+{
+    int bei,bej;
+    int i,j; 
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    char c=getchar();
+    for(i=1;i&lt;=n;i++)
+    {
+        gets(a[i]);
+    }
+    for(i=1;i&lt;=n;i++)
+    {
+        for(j=0;j&lt;=m-1;j++)
+        {
+            if(a[i][j]==&apos;s&apos;)
+            {
+                bei=i;
+                bej=j;
+            }
+        }
+    }
+    dfs(bei,bej);
+    if(jl==1)
+    {
+        printf(&quot;Yes&quot;);
+    }
+    else
+    {
+        printf(&quot;No&quot;);
+    }
+    return 0;
+}
+</code></pre><h2 id="POJ-2386-Lake-Counting"><a href="#POJ-2386-Lake-Counting" class="headerlink" title="POJ 2386 Lake Counting"></a>POJ 2386 Lake Counting</h2><h3 id="题目-5"><a href="#题目-5" class="headerlink" title="题目"></a>题目</h3><p><img src="https://www.z4a.net/images/2019/06/24/dfs-7.1.jpg" alt="dfs-7.1.jpg"></p>
+<h3 id="思路-5"><a href="#思路-5" class="headerlink" title="思路"></a>思路</h3></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://www.maple0321.club">Maple</a></p><p> <span>Link:  </span><a href="https://www.maple0321.club/2019/04/26/dfs习题讲解/">https://www.maple0321.club/2019/04/26/dfs习题讲解/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2019/04/11/个人常用OJ平台/" title="个人常用OJ平台"><span>NextPost ></span><br><span class="nextTitle">个人常用OJ平台</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#正文（例题）"><span class="toc-number">2.</span> <span class="toc-text">正文（例题）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hdu-2553-N皇后问题"><span class="toc-number">2.1.</span> <span class="toc-text">hdu 2553 N皇后问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目"><span class="toc-number">2.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路"><span class="toc-number">2.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码"><span class="toc-number">2.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1605-迷宫"><span class="toc-number">2.2.</span> <span class="toc-text">洛谷 P1605 迷宫</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1706-全排列问题"><span class="toc-number">2.3.</span> <span class="toc-text">洛谷 P1706 全排列问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-2"><span class="toc-number">2.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1036-选数"><span class="toc-number">2.4.</span> <span class="toc-text">洛谷 P1036 选数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-3"><span class="toc-number">2.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-3"><span class="toc-number">2.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-3"><span class="toc-number">2.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-AT1350-深さ優先探索"><span class="toc-number">2.5.</span> <span class="toc-text">洛谷 AT1350 深さ優先探索</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-4"><span class="toc-number">2.5.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-4"><span class="toc-number">2.5.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-4"><span class="toc-number">2.5.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#POJ-2386-Lake-Counting"><span class="toc-number">2.6.</span> <span class="toc-text">POJ 2386 Lake Counting</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-5"><span class="toc-number">2.6.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-5"><span class="toc-number">2.6.2.</span> <span class="toc-text">思路</span></a></li></ol></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
