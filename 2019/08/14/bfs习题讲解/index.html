@@ -97,7 +97,7 @@
   }
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//leo-cat.github.io" target="_black">BlackBlood</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">bfs习题讲解</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-08-14</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="bfs"> bfs</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2.7k</span> | Reading time: <span class="post-count">11</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究是心有余力不足。</p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//leo-cat.github.io" target="_black">BlackBlood</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">bfs习题讲解</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-08-14</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="bfs"> bfs</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">5.4k</span> | Reading time: <span class="post-count">27</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究是心有余力不足。</p>
 <a id="more"></a>
 <p>在这篇博客中我将根据具体例题讲解部分bfs思路，正如上面所说，思想和实现能力是相辅相成的，我在这里理清了思路，还需要进行一个系列题目的练习，才能说把思路巩固了。如果有能力再进行高级的练习以及对于题目变形的解答。我希望在讲解的过程中也可以教学相长，如有错漏还请不吝赐教。</p>
 <p>另外我有一些地方用到了结构体，不太明白的同学可以查一查，其实不难理解。</p>
@@ -410,4 +410,531 @@ int main()
     printf(&quot;-1&quot;);
     return 0;
 }    
-</code></pre><h1 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://www.maple0321.club">Maple</a></p><p> <span>Link:  </span><a href="https://www.maple0321.club/2019/08/14/bfs习题讲解/">https://www.maple0321.club/2019/08/14/bfs习题讲解/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2019/08/12/常用技巧精选/" title="常用技巧精选"><span>NextPost ></span><br><span class="nextTitle">常用技巧精选</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#正文（例题）"><span class="toc-number">2.</span> <span class="toc-text">正文（例题）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1746-离开中山路"><span class="toc-number">2.1.</span> <span class="toc-text">洛谷 P1746 离开中山路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目"><span class="toc-number">2.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路"><span class="toc-number">2.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码"><span class="toc-number">2.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#P1443-马的遍历"><span class="toc-number">2.2.</span> <span class="toc-text">P1443 马的遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1747-好奇怪的游戏"><span class="toc-number">2.3.</span> <span class="toc-text">洛谷 P1747 好奇怪的游戏</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-2"><span class="toc-number">2.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1135-奇怪的电梯"><span class="toc-number">2.4.</span> <span class="toc-text">洛谷 P1135 奇怪的电梯</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-3"><span class="toc-number">2.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-3"><span class="toc-number">2.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-3"><span class="toc-number">2.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#未完待续"><span class="toc-number">3.</span> <span class="toc-text">未完待续</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
+</code></pre><h2 id="P1825-USACO11OPEN-玉米田迷宫Corn-Maze"><a href="#P1825-USACO11OPEN-玉米田迷宫Corn-Maze" class="headerlink" title="P1825 [USACO11OPEN]玉米田迷宫Corn Maze"></a>P1825 [USACO11OPEN]玉米田迷宫Corn Maze</h2><p>在地图型bfs的基础上增加了传送门。</p>
+<h3 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h3><p><a href="https://www.luogu.org/problem/P1825" title="https://www.luogu.org/problem/P1825" target="_blank" rel="noopener">https://www.luogu.org/problem/P1825</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-5.1.jpg" alt="bfs-5.1.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-5.2.jpg" alt="bfs-5.2.jpg"></p>
+<h3 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h3><p>看题可知，传送门只会成对出现，并且与二十六个大写英文字母一一对应，不会出现一个字母对应两组传送门的情况。</p>
+<p>并且，传送门可以来回传送，但是这里有一个小坑，就是当你到达传送门所在位置的时候，必须执行传送操作，而你再想传送回来，则需要在对面的传送门向外走出一格再走回来。</p>
+<p>当时写这道题的时候在这个坑这里倒了快一个小时，分析数据和结果分析出来的。</p>
+<p>然后代码写得比较乱，看bfs函数里面的标记已走过位置的时候可能无法理解…反正看懂了大概思路就行，这些小细节因人而异。</p>
+<h3 id="代码-4"><a href="#代码-4" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int mapv[505][505]={0};
+char map[505][505];
+int trans[255][5]={0};
+struct que
+{
+    int x;
+    int y;
+    int sec;
+}que[500005];
+int pd=0;
+int m,n;
+int begi,begj;
+int head,tail;
+int xa[5]={-1,0,1,0};
+int ya[5]={0,-1,0,1};
+void bfs(int q)
+{
+    for(int i=0;i&lt;=3;i++)
+    {
+        if((que[q].x+xa[i])&gt;=0&amp;&amp;(que[q].x+xa[i])&lt;=n-1&amp;&amp;(que[q].y+ya[i])&gt;=0&amp;&amp;(que[q].y+ya[i])&lt;=m-1)
+        {
+            if(map[que[q].x+xa[i]][que[q].y+ya[i]]==&apos;=&apos;)
+            {
+                pd=1;
+                printf(&quot;%d\n&quot;,que[q].sec+1);
+                return;
+            }
+            if(mapv[que[q].x+xa[i]][que[q].y+ya[i]]==0&amp;&amp;map[que[q].x+xa[i]][que[q].y+ya[i]]!=&apos;#&apos;)
+            {
+                if(map[que[q].x+xa[i]][que[q].y+ya[i]]&gt;=&apos;A&apos;&amp;&amp;map[que[q].x+xa[i]][que[q].y+ya[i]]&lt;=&apos;Z&apos;)
+                {
+                    tail++;
+                    if((que[q].x+xa[i]+1)*m+que[q].y+ya[i]==trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][1])
+                    {
+                        que[tail].x=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][2]/m-1;
+                        que[tail].y=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][2]%m;
+                        que[tail].sec=que[q].sec+1;
+                    }    
+                    else
+                    {
+                        que[tail].x=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][1]/m-1;
+                        que[tail].y=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][1]%m;
+                        que[tail].sec=que[q].sec+1;
+                    }
+                    que[tail].sec=que[q].sec+1;
+                }
+                else
+                {
+                    tail++;
+                    que[tail].x=que[q].x+xa[i];
+                    que[tail].y=que[q].y+ya[i];
+                    que[tail].sec=que[q].sec+1;    
+                    mapv[que[q].x+xa[i]][que[q].y+ya[i]]=1;
+                }
+
+            }
+        }
+    }
+}    
+int main()
+{
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=0;i&lt;=n-1;i++)
+    {
+        scanf(&quot;%s&quot;,map[i]);
+    }
+    for(int i=0;i&lt;=n-1;i++)
+    {
+        for(int j=0;j&lt;=m-1;j++)
+        {
+            if(map[i][j]==&apos;@&apos;)
+            {
+                begi=i;
+                begj=j;
+            }
+            if(map[i][j]&gt;=&apos;A&apos;&amp;&amp;map[i][j]&lt;=&apos;Z&apos;)
+            {
+                if(trans[map[i][j]][1]==0)
+                {
+                    trans[map[i][j]][1]=(i+1)*m+j;
+                }
+                else
+                {
+                    trans[map[i][j]][2]=(i+1)*m+j;
+                }
+            }
+        }
+    }
+    head=1,tail=1;
+    que[1].x=begi;
+    que[1].y=begj;
+    que[1].sec=0;
+    mapv[begi][begj]=1;
+    while(head&lt;=tail)
+    {
+        bfs(head);
+        head++;
+        if(pd==1)
+        {
+            break;
+        }
+    }
+    return 0;
+}
+</code></pre><h2 id="P1126-机器人搬重物"><a href="#P1126-机器人搬重物" class="headerlink" title="P1126 机器人搬重物"></a>P1126 机器人搬重物</h2><p>这个题目的设置，包括每一步可走的点，以及这些点所能遇到的情况都非常复杂，当时打了一遍出来a了一半的点，改了一次又a了一半的一半，最后才改对。</p>
+<h3 id="题目-5"><a href="#题目-5" class="headerlink" title="题目"></a>题目</h3><p><a href="https://www.luogu.org/problem/P1126" title="https://www.luogu.org/problem/P1126" target="_blank" rel="noopener">https://www.luogu.org/problem/P1126</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-6.1.jpg" alt="bfs-6.1.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-6.2.jpg" alt="bfs-6.2.jpg"></p>
+<h3 id="思路-5"><a href="#思路-5" class="headerlink" title="思路"></a>思路</h3><p>首先，题目中提及机器人的形状是直径1.6m的球，然后机器人在格点上行走。而在地图上给出的黑色位置，实际上会占据四个格点。这就需要我们在录入地图的时候做出一些巧妙的变化。</p>
+<p>此处搬一下题解里雒仁韬大佬所画的图（我不认识这位大佬，如果大佬觉得搬图侵权啥的我可以删掉）</p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-6.3.JPG.png" alt="bfs-6.3.JPG.png"></p>
+<p>其次，机器人可以朝面前方向行走一格两格或者三格，但是这都是在前方没有不能行走的格点的情况下，如果行走三格，就要看看前方两格三格的地方有没有障碍物。</p>
+<p>另外，贮藏室，也就是整张地图的外围一圈是有墙体的，这点在上面那位大佬的图中也有体现。</p>
+<p>最后，普通bfs对于每个格子打上标记，而我写这道题是对每个格子的每个方向都打上标记。我写的代码有四百行，因为其中包含着很多的判断分支，肯定是可以简化的，也会有简单一些的办法，或者说查看一下大佬们的解法都可以。</p>
+<h3 id="代码-5"><a href="#代码-5" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int mak[55][55][5]={0};     
+int head,tail;
+int a,b,c,d;
+int jud=0;
+int n,m;
+struct que
+{
+    int x;
+    int y;
+    int sec;
+    int fx;      //方向：0 上 1 右 2 下 3 左
+}que[50005];
+void bfs(int ceng)
+{
+    for(int i=1;i&lt;=5;i++)  //4:向右 5:向左 
+    {
+        switch(i)
+        {
+            case 1:
+                {
+                    switch(que[ceng].fx)
+                    {
+                        case 0:
+                            {
+                                if(que[ceng].x-1&gt;=1)
+                                {
+                                    if(mak[que[ceng].x-1][que[ceng].y][que[ceng].fx]==0)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x-1;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }
+                                } 
+                            }
+                        break;
+                        case 1:
+                            {
+                                if(que[ceng].y+1&lt;=m+1)
+                                {
+                                    if(mak[que[ceng].x][que[ceng].y+1][que[ceng].fx]==0)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y+1;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }
+                                }
+                            }
+                        break;
+                        case 2:
+                            {
+                                if(que[ceng].x+1&lt;=n+1)
+                                {
+                                    if(mak[que[ceng].x+1][que[ceng].y][que[ceng].fx]==0)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x+1;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }    
+                                }
+                            }
+                        break;
+                        case 3:
+                            {
+                                if(que[ceng].y-1&gt;=1)
+                                {
+                                    if(mak[que[ceng].x][que[ceng].y-1][que[ceng].fx]==0)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y-1;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }
+                                }
+                            }
+                        break;
+                    }
+                }
+            break;
+            case 2:
+                {
+                    switch(que[ceng].fx)
+                    {
+                        case 0:
+                            {
+                                if(que[ceng].x-2&gt;=1)
+                                {
+                                    if(mak[que[ceng].x-2][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x-1][que[ceng].y][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x-2;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }
+                                } 
+                            }
+                        break;
+                        case 1:
+                            {
+                                if(que[ceng].y+2&lt;=m+1)
+                                {
+                                    if(mak[que[ceng].x][que[ceng].y+2][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y+1][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y+2;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }    
+                                }
+                            }
+                        break;
+                        case 2:
+                            {
+                                if(que[ceng].x+2&lt;=n+1)
+                                {
+                                    if(mak[que[ceng].x+2][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x+1][que[ceng].y][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x+2;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }    
+                                }
+                            }
+                        break;
+                        case 3:
+                            {
+                                if(que[ceng].y-2&gt;=1)
+                                {
+                                    if(mak[que[ceng].x][que[ceng].y-2][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y-1][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y-2;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }        
+                                }
+                            }
+                        break;
+                    }    
+                }
+            break;
+            case 3:
+                {
+                    switch(que[ceng].fx)
+                    {
+                        case 0:
+                            {
+                                if(que[ceng].x-3&gt;=1)
+                                {
+                                    if(mak[que[ceng].x-3][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x-2][que[ceng].y][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x-1][que[ceng].y][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x-3;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }
+
+                                } 
+                            }
+                        break;
+                        case 1:
+                            {
+                                if(que[ceng].y+3&lt;=m+1)
+                                {
+                                    if(mak[que[ceng].x][que[ceng].y+3][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y+2][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x][que[ceng].y+1][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y+3;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }        
+                                }
+                            }
+                        break;
+                        case 2:
+                            {
+                                if(que[ceng].x+3&lt;=n+1)
+                                {
+                                    if(mak[que[ceng].x+3][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x+2][que[ceng].y][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x+1][que[ceng].y][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x+3;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }    
+                                }
+                            }
+                        break;
+                        case 3:
+                            {
+                                if(que[ceng].y-3&gt;=1)
+                                {
+                                    if(mak[que[ceng].x][que[ceng].y-3][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y-2][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x][que[ceng].y-1][que[ceng].fx]!=1)
+                                    {
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y-3;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        {
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        }
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    }        
+                                }
+                            }
+                        break;
+                    }
+                }
+            break;
+            case 4:
+                {
+                    if(mak[que[ceng].x][que[ceng].y][(que[ceng].fx+1)%4]==0)
+                    {
+                        tail++;
+                        que[tail].x=que[ceng].x;
+                        que[tail].y=que[ceng].y;
+                        que[tail].sec=que[ceng].sec+1;
+                        que[tail].fx=que[ceng].fx+1;
+                        que[tail].fx%=4;
+                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                    }    
+                }
+            break;
+            case 5:
+                {
+                    if(mak[que[ceng].x][que[ceng].y][(que[ceng].fx+3)%4]==0)
+                    {
+                        tail++;
+                        que[tail].x=que[ceng].x;
+                        que[tail].y=que[ceng].y;
+                        que[tail].sec=que[ceng].sec+1;
+                        que[tail].fx=que[ceng].fx+3;
+                        que[tail].fx%=4;
+                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                    }        
+                }
+            break;
+        }
+    }
+}
+int main()
+{
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    int k;
+    char e;
+    for(int i=1;i&lt;=n;i++)
+    {
+        for(int j=1;j&lt;=m;j++)
+        {
+            scanf(&quot;%d&quot;,&amp;k);
+            if(k==1)
+            {
+                for(int q=0;q&lt;=3;q++)
+                {
+                    mak[i][j][q]=1;
+                    mak[i][j+1][q]=1;
+                    mak[i+1][j][q]=1;
+                    mak[i+1][j+1][q]=1;
+                }
+            }
+        }
+    }
+    for(int i=1;i&lt;=n+1;i++)
+    {
+        for(int q=0;q&lt;=3;q++)
+        {
+            mak[i][1][q]=1;
+            mak[i][m+1][q]=1;
+        }
+    }
+    for(int j=1;j&lt;=m+1;j++)
+    {
+        for(int q=0;q&lt;=3;q++)
+        {
+            mak[1][j][q]=1;
+            mak[n+1][j][q]=1;
+        }
+    }
+    scanf(&quot;%d%d%d%d %c&quot;,&amp;a,&amp;b,&amp;c,&amp;d,&amp;e);
+    head=1;
+    tail=1;
+    a+=1;
+    b+=1;
+    c+=1;
+    d+=1;
+    if(a==c&amp;&amp;b==d)
+    {
+        printf(&quot;0&quot;);
+        return 0;
+    }
+    que[head].x=a;
+    que[head].y=b;
+    que[head].sec=0;
+    switch(e)
+    {
+        case &apos;N&apos;:que[head].fx=0;
+        break;
+        case &apos;E&apos;:que[head].fx=1;
+        break;
+        case &apos;S&apos;:que[head].fx=2;
+        break;
+        case &apos;W&apos;:que[head].fx=3;
+        break;
+    }
+    mak[a][b][que[head].fx]=1;
+    while(head&lt;=tail)
+    {
+        bfs(head);
+        head++;
+        if(jud==1)    //下一步已经试探出终点 
+        {
+            break;
+        }
+    }
+    if(jud==0)
+    {
+        printf(&quot;-1&quot;);
+    }
+    return 0;
+}
+</code></pre><h1 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://www.maple0321.club">Maple</a></p><p> <span>Link:  </span><a href="https://www.maple0321.club/2019/08/14/bfs习题讲解/">https://www.maple0321.club/2019/08/14/bfs习题讲解/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2019/08/12/常用技巧精选/" title="常用技巧精选"><span>NextPost ></span><br><span class="nextTitle">常用技巧精选</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#正文（例题）"><span class="toc-number">2.</span> <span class="toc-text">正文（例题）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1746-离开中山路"><span class="toc-number">2.1.</span> <span class="toc-text">洛谷 P1746 离开中山路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目"><span class="toc-number">2.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路"><span class="toc-number">2.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码"><span class="toc-number">2.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#P1443-马的遍历"><span class="toc-number">2.2.</span> <span class="toc-text">P1443 马的遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1747-好奇怪的游戏"><span class="toc-number">2.3.</span> <span class="toc-text">洛谷 P1747 好奇怪的游戏</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-2"><span class="toc-number">2.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#洛谷-P1135-奇怪的电梯"><span class="toc-number">2.4.</span> <span class="toc-text">洛谷 P1135 奇怪的电梯</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-3"><span class="toc-number">2.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-3"><span class="toc-number">2.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-3"><span class="toc-number">2.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#P1825-USACO11OPEN-玉米田迷宫Corn-Maze"><span class="toc-number">2.5.</span> <span class="toc-text">P1825 [USACO11OPEN]玉米田迷宫Corn Maze</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-4"><span class="toc-number">2.5.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-4"><span class="toc-number">2.5.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-4"><span class="toc-number">2.5.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#P1126-机器人搬重物"><span class="toc-number">2.6.</span> <span class="toc-text">P1126 机器人搬重物</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目-5"><span class="toc-number">2.6.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思路-5"><span class="toc-number">2.6.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码-5"><span class="toc-number">2.6.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#未完待续"><span class="toc-number">3.</span> <span class="toc-text">未完待续</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
