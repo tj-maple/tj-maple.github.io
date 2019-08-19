@@ -97,7 +97,7 @@
   }
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//leo-cat.github.io" target="_black">BlackBlood</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Floyd（弗洛伊德）</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-08-19</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="图论"> 图论</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="最短路"> 最短路</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2.2k</span> | Reading time: <span class="post-count">8</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>到了如今，最短路问题已经得到了很多种解法。这些解法有相同的地方，也有不同的地方，性能也有所差异。但是，如果一种问题得出的某种解法优于其他解法太多，其他这些解法就应该随时间流逝而被逐渐淘汰。最短路问题的这些解法如今仍屹立不倒，足可说明它们各有偏重的方向。</p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//leo-cat.github.io" target="_black">BlackBlood</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Floyd（弗洛伊德）</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-08-19</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="图论"> 图论</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="最短路"> 最短路</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2.4k</span> | Reading time: <span class="post-count">9</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>到了如今，最短路问题已经得到了很多种解法。这些解法有相同的地方，也有不同的地方，性能也有所差异。但是，如果一种问题得出的某种解法优于其他解法太多，其他这些解法就应该随时间流逝而被逐渐淘汰。最短路问题的这些解法如今仍屹立不倒，足可说明它们各有偏重的方向。</p>
 <a id="more"></a>
 <p>floyd，（又称Floyd-Warshall）即弗洛伊德算法，是一种利用动态规划的思想寻找给定的加权图中多源点之间最短路径的算法。简单来说，是一种能够解决多源最短路的算法。但是，floyd无法处理具有负权环的图。这里提一句，floyd同样可以解决图的连通性问题。</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>同大多数动态规划算法一样，floyd的核心代码只有短短几行。</p>
@@ -234,4 +234,53 @@ int main()
     return 0;
 }
 </code></pre><p>floyd的逻辑很清晰，相信大家自己也可以一步一步走出每一步的作用。另外在上面已经尝试着分析过一段核心代码了，在这里我就不对标准代码做讲解了。</p>
-<h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><h1 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://www.maple0321.club">Maple</a></p><p> <span>Link:  </span><a href="https://www.maple0321.club/2019/08/19/Floyd/">https://www.maple0321.club/2019/08/19/Floyd/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2019/08/14/bfs习题讲解/" title="bfs习题讲解"><span>NextPost ></span><br><span class="nextTitle">bfs习题讲解</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#正文"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#讲解"><span class="toc-number">2.1.</span> <span class="toc-text">讲解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标准代码"><span class="toc-number">2.2.</span> <span class="toc-text">标准代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例题"><span class="toc-number">2.3.</span> <span class="toc-text">例题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#未完待续…"><span class="toc-number">3.</span> <span class="toc-text">未完待续…</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
+<h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><h3 id="HDU-2544-最短路"><a href="#HDU-2544-最短路" class="headerlink" title="HDU 2544 最短路"></a>HDU 2544 最短路</h3><p>就是一个模板的单源最短路。</p>
+<h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p><a href="acm.hdu.edu.cn/showproblem.php?pid=2544" title="acm.hdu.edu.cn/showproblem.php?pid=2544">acm.hdu.edu.cn/showproblem.php?pid=2544</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-4.1.jpg" alt="floyd-4.1.jpg"></p>
+<h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><p>就是个很普通的单源最短路，按照正常的流程，初始化，核心就可以解决。需要注意的点有一个，就是题目中说C&lt;=1000，是不准确的，需要把最大值调整到200000。</p>
+<h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><pre><code>#include&lt;stdio.h&gt;
+#define MAX 200005
+int main()
+{
+    int n,m;
+    int a,b,c;
+    int h[105][105];
+    while(1)
+    {    
+        scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+        if(n==0&amp;&amp;m==0)
+        {
+            break;
+        }
+        for(int i=1;i&lt;=n;i++)
+        {
+            for(int j=1;j&lt;=n;j++)
+            {
+                h[i][j]=MAX;
+            }
+        }
+        for(int i=1;i&lt;=m;i++)
+        {
+            scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+            h[a][b]=c;
+            h[b][a]=c;
+        }
+        for(int k=1;k&lt;=n;k++)
+        {
+            for(int i=1;i&lt;=n;i++)
+            {
+                for(int j=1;j&lt;=n;j++)
+                {
+                    if(h[i][j]&gt;h[i][k]+h[k][j])
+                    {
+                        h[i][j]=h[i][k]+h[k][j];
+                        h[j][i]=h[i][j];
+                    }    
+                }
+            }
+        }
+        printf(&quot;%d\n&quot;,h[1][n]);
+    }
+    return 0;
+}
+</code></pre><h1 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://www.maple0321.club">Maple</a></p><p> <span>Link:  </span><a href="https://www.maple0321.club/2019/08/19/Floyd/">https://www.maple0321.club/2019/08/19/Floyd/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2019/08/14/bfs习题讲解/" title="bfs习题讲解"><span>NextPost ></span><br><span class="nextTitle">bfs习题讲解</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#正文"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#讲解"><span class="toc-number">2.1.</span> <span class="toc-text">讲解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标准代码"><span class="toc-number">2.2.</span> <span class="toc-text">标准代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例题"><span class="toc-number">2.3.</span> <span class="toc-text">例题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HDU-2544-最短路"><span class="toc-number">2.3.1.</span> <span class="toc-text">HDU 2544 最短路</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#题目"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#思路"><span class="toc-number">2.3.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码"><span class="toc-number">2.3.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#未完待续…"><span class="toc-number">3.</span> <span class="toc-text">未完待续…</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
