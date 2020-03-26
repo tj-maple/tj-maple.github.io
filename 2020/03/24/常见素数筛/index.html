@@ -97,11 +97,13 @@
   }
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">常见素数筛</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2020-03-24</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="数论"> 数论</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">3.5k</span> | Reading time: <span class="post-count">13</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在数学的王国里，质数（也即素数）是数这个范围内一枚闪闪发光的重要宝石，很多公式和定理都与素数有关。这样，如何判断一个数是否是素数也是一个重要的问题，只不过这个问题的解法相当显而易见，那么我们的目光就要更多的放在对于判断素数的算法的性能的优化上了（更多的是时间复杂度）。<br><a id="more"></a></p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">T's blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">常见素数筛</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2020-03-24</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="数论"> 数论</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">3.6k</span> | Reading time: <span class="post-count">13</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在数学的王国里，质数（也即素数）是数这个范围内一枚闪闪发光的重要宝石，很多公式和定理都与素数有关。这样，如何判断一个数是否是素数也是一个重要的问题，只不过这个问题的解法相当显而易见，那么我们的目光就要更多的放在对于判断素数的算法的性能的优化上了（更多的是时间复杂度）。</p>
+<a id="more"></a>
 <p>有关质数的定义和性质在这里就不过多阐述了，我在本篇文章中主要讲解三种素数筛法，分别是朴素筛，埃筛以及欧筛（再有别的我就不知道了……菜的我）。</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="朴素筛"><a href="#朴素筛" class="headerlink" title="朴素筛"></a>朴素筛</h2><p>平时大家最常用的应该就是朴素筛了，这种筛法的原理依赖于素数的定义：在大于1的自然数中，除了1和它本身以外不再有其他因数的自然数。这样就衍生出了一种判断素数的方法，即把当前需要判断的数n作为被模除数，用n不断从2开始到n-1尝试模除，如果结果等于0，代表可以整除，即也代表该数除了1与它本身有其他因数，故不符合素数定义，达到判断素数的功能。</p>
 <h3 id="原理论证"><a href="#原理论证" class="headerlink" title="原理论证"></a>原理论证</h3><p>朴素筛的原理在上面大概讲清楚了，在这里我们主要论证两个问题。一个是从模除（2~n-1）优化到模除（2~sqrt(n)）的原理，还有就是对于朴素筛的时间复杂度的估算（虽然很简单）。</p>
-<p>这里先摆出一段核心代码（模除2~i-1）</p>
+<p>这里先摆出一段判断2~n所有数是质数还是合数的核心代码（模除2~i-1）</p>
+<p>a数组中0代表该数是合数、1代表该数是质数</p>
 <pre><code>for(int i=2;i&lt;=n;i++)
 {
     for(int j=2;j&lt;=i-1;j++)
@@ -113,8 +115,8 @@
         }
     }
 }
-</code></pre><p>这里的a数组记录了某个数是质数还是合数，a数组在一开始都被赋了1为初值，代表所有数在未判别之前默认是质数（1除外，1另外赋值为0，因为不需要判断），当i（待判断数）能够整除j，则说明j是i的一个非1非本身因子，也即说明i不是一个质数，就可以赋值为0，不需要再向下进行尝试了。</p>
-<p>通过这里很明显可以得出大概时间复杂度为O（N^2)。</p>
+</code></pre><p>a数组在一开始都被赋了1为初值，代表所有数在未判别之前默认是质数（1除外，1另外赋值为0，因为不需要判断），当i（待判断数）能够整除j，则说明j是i的一个非1非本身因子，也即说明i不是一个质数，就可以赋值为0，不需要再向下进行尝试了。</p>
+<p>通过这里很明显可以得出大概时间复杂度为O(N^2)。</p>
 <p>再看一段经过优化的核心代码（模除2~sqrt(i)）</p>
 <pre><code>for(int i=2;i&lt;=n;i++)
 {
@@ -127,11 +129,11 @@
         }
     }
 }
-</code></pre><p>这段代码的时间复杂度很明显也可以得出大概为O（N&radic;N）。</p>
+</code></pre><p>这段代码的时间复杂度很明显也可以得出大概为O(N&radic;N)。</p>
 <p>现在我们来论证一下这个小优化的正确性。</p>
-<p>首先我们可以看出来，这么优化造成的后果是不再尝试模除（sqrt(i)~i-1）区间的数。那么，不尝试这些数会不会对最终的判断结果造成什么影响呢？</p>
+<p>首先我们可以看出来，这么优化造成的结果是不再尝试模除（sqrt(i)~i-1）区间的数。那么，不尝试这些数会不会对最终的判断结果造成什么影响呢？</p>
 <p>我们知道sqrt(i)&times;sqrt(i)的结果就是i，那么当一个数x&gt;sqrt(i)时，如果i%x==0，那么在2~sqrt(i)这个区间内一定有一个数k，能够使得i%k==0，因为k&times;x等于i。这样，在后面的区间内，如果存在i的非1非本身因子，则在前面的区间里，也存在这样一个因子，所以不需要遍历后面的区间了。</p>
-<p>另外，在很多题目中，会对这个小优化的时间复杂度进行限制，不用的话往往会TLE。</p>
+<p>另外，我遇到过有一些题目，会对这个小优化的时间复杂度进行限制，不用的话会TLE。</p>
 <h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><pre><code>#include&lt;stdio.h&gt;
 #include&lt;math.h&gt;
 int main()
@@ -163,10 +165,11 @@ int main()
 } 
 </code></pre><p>在这里我是用了一个数组来记录所有数是质数还是合数，但是在实际题目中，这个需求会有很多种，常见的可能会输出质数表或者判断某个数是否是质数，这可以视题目要求再进行具体变化。</p>
 <h2 id="埃筛"><a href="#埃筛" class="headerlink" title="埃筛"></a>埃筛</h2><p>埃筛是埃拉托斯特尼筛的简称，又叫(Eratosthenes筛)。是一种由希腊数学家埃拉托斯特尼所提出的一种简单检定素数的算法。要得到自然数n以内的全部素数，必须把不大于根号n的所有素数的倍数剔除，剩下的就是素数。（百度百科）</p>
-<p>埃筛对于朴素筛通过提前标记质数的倍数为合数避免了很多数的判断，相当于利用了质数的性质进行了算法的优化，成功的降低了时间复杂度。</p>
-<h3 id="原理论证-1"><a href="#原理论证-1" class="headerlink" title="原理论证"></a>原理论证</h3><p>我们在放出代码之后再进行埃筛的时间复杂度分析，现在这里主要是论证埃筛的大致原理以及埃筛内容中的一点小优化。</p>
-<p>正如上面所说，埃筛的思想大概就是利用了质数不能有非1非本身其他因子的出现，而质数的倍数一定是一个合数这个性质，避免了到该质数时的朴素判断。</p>
+<p>埃筛通过提前标记质数的倍数为合数避免了很多数的判断，相当于利用了质数的性质进行了算法的优化，成功的降低了时间复杂度。</p>
+<h3 id="原理论证-1"><a href="#原理论证-1" class="headerlink" title="原理论证"></a>原理论证</h3><p>我们在放出代码之后再进行埃筛的时间复杂度分析，现在这里主要来论证埃筛的大致原理以及埃筛内容中的一点小优化。</p>
+<p>正如上面所说，埃筛的思想大概就是利用了质数不能有非1非本身其他因子的出现，而质数的倍数一定是一个合数这个性质（其实合数的倍数也是合数，但是合数的倍数会在之前被标记到），避免了外部循环遍历到该质数时的朴素判断。</p>
 <p>原理上来说，我们仍然在一开始假定所有数都是质数，从2开始，对2的所有小于n的倍数进行标记，标记它们为合数，在之后的遍历中，如果遍历到合数则无需再次判断，也不需要再标记该合数的倍数（因为该合数的倍数一定也是标记这个合数的质数的倍数，一定也已经被标记过了）。而遍历到3时，3没有被标记为合数，则需标记3的倍数······</p>
+<p><a href="https://www.z4a.net/image/ev93KE" target="_blank" rel="noopener"><img src="https://www.z4a.net/images/2020/03/26/1.1.md.png" alt="1.1.md.png"></a></p>
 <p>那么这里有一个问题，我们可以直观地看出3是个质数，它被筛过理所应当，但是有没有合数被错误的筛过呢？</p>
 <p>我们现在假设一个数x为合数，而x一定存在至少一个非1非本身因数。假设这个因数本身是个合数，则它与x本质上没有区别，仍然至少存在一个非1非本身因数。而假设这个因数本身是个质数，则该合数就已经被标记。而假如该数x的因数是合数，x的因数的因数也是一个合数，也不过是将这个判断过程不断传递下去，最终会在一个无法被分成合数&times;合数的节点上变成质数&times;质数或者是质数&times;合数。总归是会被一个质数标记的，这样子就证明了埃筛理论上的严谨性与健壮。</p>
 <p>现在我们来说一点小优化</p>
