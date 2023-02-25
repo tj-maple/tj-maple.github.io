@@ -1,0 +1,178 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>递推算法 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">递推算法</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="递推"> 递推</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>递推算法作为基础算法之一，递推的思想不难理解，难点在于多变的递推公式以及找寻递推关系时蕴含的数学的思维。由于递推算法的关键问题是得到递推关系，这种关系是一种高效的数学模型（ACM-ICPC基本算法中是这么说的），而且又灵活多变，为递推算法题目的解决带来了不少困难。所以，我认为有必要开专题对常见递推思路进行列举讲解，顺带着讲解一下递推算法的基础知识。</p>
+<span id="more"></span>
+
+<p>而且，递推关系或者说这种递推思维，不仅仅在各数学分支中发挥重要作用，它甚至延伸到了各个领域，在每个领域中都起了一定的作用。这恰恰契合了我当初高中学习编程之后的感受，也就是初步建立起了对事情的逻辑能力。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><p>递推，是指从已知的初始条件出发，不断得到需要的中间条件，最后求得最后结果。递推是一直向前或者向后（因为递推包含顺推和逆推）一步步走的，而且递推法利用了问题本身所具有的性质来总结递推关系，推导递推公式，问题的性质不同，就使得递推关系多种多样，有一些题就无从下手。</p>
+<p>我们想要用递推法，先需要判断一道题应不应该用递推法来做。一般来说，可以用递推法做的题目首先要是可以把一整个大目标分解成诸多非常相似的小目标，这样可以先把目标化小，再用循环来不断求出这些小目标，即用递推式求解，可以使计算机发挥它的长处————重复大量计算。</p>
+<p>递推法大致分为两类：</p>
+<p>分别是</p>
+<blockquote>
+<p>（1）顺推法</p>
+<p>（2）逆推法</p>
+</blockquote>
+<p>两者的不同大概就是推导顺序不同，这点从两种推法的名字上可见一斑。顺推法给你初始的已知条件，让你求最终结果，而逆推法给你最终结果，让你求最初的状态，也就是顺推法的逆向推导。两种方法其实没有太大本质上的区别，还是个人来看要做的那道题更适合哪种方法再用哪个。</p>
+<p>至于递推法的过程，大概还是有一个标准的</p>
+<ol>
+<li>确定递推变量</li>
+<li>建立递推关系</li>
+<li>确定边界条件</li>
+<li>控制递推过程</li>
+</ol>
+<p>找递推变量这一条一般比较容易，因为所求的结果一般都会在题目中给出来，一眼就能看到，稍微总结一下就能知道，就是递推变量可能不只是普通变量，也可能是数组之类的。</p>
+<p>难点在于第二点，找递推关系。正如我之前的概述所说的，由于递推关系是一种高效的数学模型，要知道，任何东西和数学一扯上关系，事就变多了。在找递推关系的时候，一定要充分运用理性的逻辑思维，总结每一步的推导公式时一定要考虑到当前状态到下一状态的所有情况，而且在有些时候，运用的数学定理之类的可能已经超过了你的知识面，需要你去进行快速理解和拓展。</p>
+<p>确定边界条件应该也不足以称为难点，一般题目中都会给出来，或者很明显一眼就可以看出来，在这里就不多说了，这是递推的基础。</p>
+<p>最后，控制递推过程。一般是通过循环语句来控制，我们在执行递推的时候需要判断什么时候开始递推，而什么时候停止递推。</p>
+<h2 id="几种典型递推过程"><a href="#几种典型递推过程" class="headerlink" title="几种典型递推过程"></a>几种典型递推过程</h2><p>这里列举几种典型的递推过程，可能并不全面，如果以后遇到了还会再添加。</p>
+<h3 id="Fibonacci数列"><a href="#Fibonacci数列" class="headerlink" title="Fibonacci数列"></a>Fibonacci数列</h3><p>Fibonacci数列即斐波那契数列，相信各位的小学老师都给大家讲过吧，在大家还没有接触计算机语言的时候，斐波那契数列已经深深印在我们的灵魂里了，这也是所有递推问题中，最为大家所知的一种了。</p>
+<pre><code>斐波那契数列（Fibonacci sequence），又称黄金分割数列、因数学家列昂纳多·斐波那契（LeonardodaFibonacci）
+以兔子繁殖为例子而引入，故又称为“兔子数列”，指的是这样一个数列：1、1、2、3、5、8、13、21、34、……
+在数学上，斐波那契数列以如下被以递推的方法定义：F(1)=1，F(2)=1, F(n)=F(n-1)+F(n-2)（n&gt;=3，n∈N*）
+在现代物理、准晶体结构、化学等领域，斐波纳契数列都有直接的应用，为此，美国数学会从1963年起出版了以《斐波纳契数列季刊》
+为名的一份数学杂志，用于专门刊载这方面的研究成果。
+                                                                                ————选自百度百科  \\*_*
+</code></pre>
+<p>斐波那契的大致定义我想不用我多说了，那就来说一下大致的特点吧。</p>
+<p>特点就是F(1)&#x3D;F(2)&#x3D;1,F(n)&#x3D;F(n-1)+F(n-2),(n&gt;&#x3D;3)。然后某个点的值等于上一个点的值加上上一个的上一个点的值。</p>
+<p>而斐波那契数列的解法虽然简单，但这并不代表着这种递推已经退出了历史舞台，在一些比赛中，仍然有使用隐含斐波那契数列递推的签到题，有的甚至还比较隐晦，还有很多题型都可以用这个方法解决，而且递推的最重要的地方，就是它的思维方式，这种思维方式看着十分简单，但是仍然能够在一些地方给我们启发。</p>
+<h3 id="Hanoi塔"><a href="#Hanoi塔" class="headerlink" title="Hanoi塔"></a>Hanoi塔</h3><p>Hanoi塔也叫汉诺塔问题，汉诺塔（又称河内塔）问题是源于印度一个古老传说的益智玩具。大梵天创造世界的时候做了三根金刚石柱子，在一根柱子上从下往上按照大小顺序摞着64片黄金圆盘。大梵天命令婆罗门把圆盘从下面开始按大小顺序重新摆放在另一根柱子上。并且规定，在小圆盘上不能放大圆盘，在三根柱子之间一次只能移动一个圆盘。（————取自百度百科）</p>
+<p>总结出来的要求大概这样</p>
+<ol>
+<li>一次只能移一个圆盘；</li>
+<li>圆盘只能在三个柱上存放；</li>
+<li>在移动过程中，不允许大盘压小盘。</li>
+</ol>
+<p>汉诺塔问题一般会问到把一叠圆盘按照原顺序换到另外一个柱子上的过程，或者是问到换柱子所用到的步数。大体来说，一个新人刚刚看到汉诺塔问题好像并不会把它联想到递推过程，但是我们先来模拟一下3个盘子3根柱子的换位过程，我们把三个分别半径为1、2、3的盘子从A柱子全部按顺序换到C柱子的过程。</p>
+<p><img src="https://www.z4a.net/images/2020/01/08/0.1.png" alt="0.1.png"></p>
+<p>整个过程是这样的</p>
+<p>首先，从A上面拿下来1放到C，再把2拿下来放到B（1是最上面的圆盘，2是中间的）。然后再把1放到B里的2上，形成这样子。</p>
+<p><img src="https://www.z4a.net/images/2020/01/08/0.2.png" alt="0.2.png"></p>
+<p>然后把3从A丢到C，再把1扔到A，2扔到C，最后1扔到C上，就把1、2、3都扔到C上了。</p>
+<p>我们再来看一下1、2都在B上而3已经在C上的时候。这时，我们把1和2从B扔到C是不是和把1和2从A扔到B是类似的过程呢。</p>
+<p>先别下结论，我们再来看一下如果是两个圆盘呢。我们只需要把1从A移到B，然后把2从A移到C，最后再把1从B移到C。这个过程是不是又和3个圆盘移两个的过程类似呢，我们仔细思考一下，四个圆盘扔三个是不是和3个圆盘的时候一样呢？</p>
+<p>认真考虑之后我们发现，确实是一样的，这就找到了不同的圆盘数量，换柱子的内在联系了，这也是找到递推关系最重要的一步。</p>
+<p>至于n个圆盘全从A换到C的搬动次数的计算公式大概是这样的，先把n-1个从A换到B，把第n个扔到C之后，再把n-1个从B到C，所以F(n)&#x3D;F(n-1)*2+1。</p>
+<h3 id="平面分割问题"><a href="#平面分割问题" class="headerlink" title="平面分割问题"></a>平面分割问题</h3><p>这类问题有几种，大概是各种各样的线条分割一整个平面空间，有直线，有曲线，有折线，有椭圆形，有三角形。以直线为例子，题意是这样的，一整个平面，n条直线最多把整个空间分成多少块，曲线折线等等都差不多。</p>
+<p>具体的解题思路是这样子的,当有n-1条直线的时候，平面最多被分成F(n-1)块，第n条线出现的时候，如果我们想要分块尽量多，就要让新出现的直线与之前每一条直线都有一个交点，这样就会产生n-1个交点，n-1个交点会把这第n条直线分成2条射线和n-2个线段，而每条射线和线段把现有的空间一分为二，故F(n)&#x3D;F(n-1)+n。</p>
+<p>折线以及椭圆形的分割方式略有小小不同，希望大家可以先开动脑筋想一想，实在想不出来也没啥，去网上搜一搜，网上的博客里面都有，查一查会找到的。</p>
+<p>图画起来太麻烦了，以后补上吧。</p>
+<h3 id="Catalan数"><a href="#Catalan数" class="headerlink" title="Catalan数"></a>Catalan数</h3><p>Catalan数又称卡特兰数，卡塔兰数。</p>
+<p>卡特兰数又称卡塔兰数，卡特兰数是组合数学中一个常出现在各种计数问题中的数列。以比利时的数学家欧仁·查理·卡塔兰 (1814–1894)的名字来命名。</p>
+<p>卡特兰数应用有很多，最先是应用在凸多边形三角划分上的。</p>
+<p>在一个凸多边形中，通过若干条互不相交的对角线，把这个多边形划分成了若干个三角形。任务是键盘上输入凸多边形的边数n，求不同划分的方案数f（n）。比如当n&#x3D;6时，f（6）&#x3D;14。</p>
+<p>其他应用还有，比如出栈顺序数，比如括号化……就很多，如果想要了解，也可以查查百度，甚至是查一查百度百科，毕竟我这些都是在百科上看的……(咳咳，还是遇到过一些的，比如出栈顺序……)。</p>
+<p>至于递推公式，一共有四个，意义相同，有优有劣，我在这里列出来，以后我自己论证了优劣性再做解释。</p>
+<pre><code>h(n)= h(0)*h(n-1)+h(1)*h(n-2) + ... + h(n-1)*h(0) (n&gt;=2)
+
+h(n)=h(n-1)*(4*n-2)/(n+1);
+
+h(n)=C(2n,n)/(n+1) (n=0,1,2,...)
+
+h(n)=c(2n,n)-c(2n,n-1)(n=0,1,2,...)
+</code></pre>
+<p>大概典型就这样，如果以后遇到了再补充。</p>
+<h1 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h1><p>未完待续……</p>
+<p>P1028 数的计算</p>
+<p>P1192 台阶问题</p>
+<p>P1216 [IOI1994][USACO1.5]数字三角形 Number Triangles</p>
+<p>P1595 信封问题</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/%E9%80%92%E6%8E%A8%E7%AE%97%E6%B3%95/">http://www.unknown9t.com/2022/04/29/%E9%80%92%E6%8E%A8%E7%AE%97%E6%B3%95/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/%E5%B8%B8%E8%A7%81%E7%B4%A0%E6%95%B0%E7%AD%9B/" title="常见素数筛"><span>< PreviousPost</span><br><span class="prevTitle">常见素数筛</span></a><a class="nextSlogan" href="/2022/04/29/%E5%B9%B6%E6%9F%A5%E9%9B%86/" title="并查集"><span>NextPost ></span><br><span class="nextTitle">并查集</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">2.1.</span> <span class="toc-text">基础知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%A0%E7%A7%8D%E5%85%B8%E5%9E%8B%E9%80%92%E6%8E%A8%E8%BF%87%E7%A8%8B"><span class="toc-number">2.2.</span> <span class="toc-text">几种典型递推过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Fibonacci%E6%95%B0%E5%88%97"><span class="toc-number">2.2.1.</span> <span class="toc-text">Fibonacci数列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hanoi%E5%A1%94"><span class="toc-number">2.2.2.</span> <span class="toc-text">Hanoi塔</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B3%E9%9D%A2%E5%88%86%E5%89%B2%E9%97%AE%E9%A2%98"><span class="toc-number">2.2.3.</span> <span class="toc-text">平面分割问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Catalan%E6%95%B0"><span class="toc-number">2.2.4.</span> <span class="toc-text">Catalan数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BE%8B%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">例题</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>蓝桥杯和天梯赛赛后感受 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">蓝桥杯和天梯赛赛后感受</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>2019年4月1日，是四月的第一天，也是新的一周的开始。上周六刚去北京打了一场天梯赛，回想起来，感触还是挺多的，所以决定和上上周日打的蓝桥杯一起，写一篇赛后的感受，自己菜就要多反省自己为什么菜。</p>
+<span id="more"></span>
+
+<p>因为天梯赛是十人团体赛，蓝桥杯是个人赛，所以备赛重点放在了天梯赛上。一开始认为蓝桥杯比天梯赛难一些，抱着去参观的心态去打的，便没有太大的心理压力（也是因为是个人赛，自己菜不会影响队友）。乍一看题，并没有过脑子，想当然的忽略了很重要的条件，便先丢五分。随后更是在一些地方，犯下了低级的错误，是一道排序找最大公约数的题，被我当成了排序之后直接找最小差值的题，真的是没用脑子。还有题只让输出后四位的，我却直接输出了全部，而且完全没有注意数过大溢出之后，由负变正的可能，直接觉得得出了正确答案。</p>
+<p>打完蓝桥杯，和学长和同学对过题之后，感觉自己的脑子真的一团乱麻，自己把这场比赛当成参观就真的去参观了。这首先是态度和心理问题，其次也是自己的技术问题，一些本能性注意的东西，直接被我过滤掉了，真正的比赛中一点点的小错，可能会让我和得奖失之交臂。</p>
+<p>说完自己不好的地方，说说仍有希望的地方吧。蓝桥杯我只打了两个小时就出场了，一个原因是对于鼠标键盘确实不适应，当时的环境也给了我很大的心理压力，第二个原因就是我对于题有些轻视，没有检查自己对于题意的理解是否正确。假设我没有提前离场，仍有可能与当前分数一样，但我更相信自己可以检查出这些错漏的地方。</p>
+<p>至于天梯赛，我确实准备了一些东西，在赛前也做过一些题目，模拟赛也打了，但是到了正式赛，我认为成绩确实不如我的心意。虽然有题目难的原因，但是我觉得我不应该把比赛的失败推诿给环境因素。大家比赛的环境因素几近完全相同，为什么我却不能适应难一些的基础题型，这确实给我上了一节课。</p>
+<p>打完天梯赛我也自闭了两天，期间倒没有想太多东西，就是觉得自己努力的不够。我不能只和周围暂时没我分高的同学比较，我应该和比我更强大的同届同学相比，甚至与上一届的学长相较量。我与这些人相比，无论是技术层面，还是主观的努力方面都远远不如。我虽然还可以用我还年轻来麻痹自己或者给予自己信心，但是我觉得大一下学期已经不年轻了，天梯赛里中学生队伍都在我之上，我已经没有理由不去努力了。</p>
+<p>又因为一些原因，看到了北大的大神吉如一对本次比赛的看法，深深觉得自己的不足。百度了一下吉如一的简介，大神从初中接触算法，始终保持的热爱与兴趣，是我梦寐以求的。</p>
+<p>如今，我希望可以通过自己的努力，达成自己的目标。希望我可以不断地学习，终于有一天可以尽自己的力，做自己喜欢做的事。</p>
+<p><img src="https://www.z4a.net/images/2019/04/01/tts.jpg" alt="tts.jpg"></p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/%E8%93%9D%E6%A1%A5%E6%9D%AF%E4%B8%8E%E5%A4%A9%E6%A2%AF%E8%B5%9B%E8%B5%9B%E5%90%8E%E6%84%9F%E5%8F%97/">http://www.unknown9t.com/2022/04/29/%E8%93%9D%E6%A1%A5%E6%9D%AF%E4%B8%8E%E5%A4%A9%E6%A2%AF%E8%B5%9B%E8%B5%9B%E5%90%8E%E6%84%9F%E5%8F%97/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8OJ%E5%B9%B3%E5%8F%B0/" title="个人常用OJ平台"><span>< PreviousPost</span><br><span class="prevTitle">个人常用OJ平台</span></a><a class="nextSlogan" href="/2022/04/29/%E5%86%99%E5%9C%A8%E4%B8%80%E5%88%87%E4%B9%8B%E5%89%8D/" title="写在一切之前"><span>NextPost ></span><br><span class="nextTitle">写在一切之前</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

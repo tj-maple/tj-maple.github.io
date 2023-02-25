@@ -1,0 +1,475 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Floyd（弗洛伊德） · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Floyd（弗洛伊德）</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="图论"> 图论</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="最短路"> 最短路</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>到了如今，最短路问题已经得到了很多种解法。这些解法有相同的地方，也有不同的地方，性能也有所差异。但是，如果一种问题得出的某种解法优于其他解法太多，其他这些解法就应该随时间流逝而被逐渐淘汰。最短路问题的这些解法如今仍屹立不倒，足可说明它们各有偏重的方向。</p>
+<span id="more"></span>
+
+<p>floyd，（又称Floyd-Warshall）即弗洛伊德算法，是一种利用动态规划的思想寻找给定的加权图中多源点之间最短路径的算法。简单来说，是一种能够解决多源最短路的算法。但是，floyd无法处理具有负权环的图。这里提一句，floyd同样可以解决图的连通性问题。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>同大多数动态规划算法一样，floyd的核心代码只有短短几行。</p>
+<pre><code>for(int k=1;k&lt;=n;k++)
+&#123;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            if(h[i][k]+h[k][j]&lt;h[i][j])
+            &#123;
+                h[i][j]=h[i][k]+h[k][j];
+                h[j][i]=h[i][k]+h[k][j];
+            &#125;
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>在这几行中，却是三重循环嵌套，这导致floyd的时间复杂度达到了O(n^3)。但是，与其相对应的是floyd对于稠密图处理的简单与高效。另外，floyd对于每对起点终点枚举的查询方式，造成了它能够解决多源最短路的特性。</p>
+<h2 id="讲解"><a href="#讲解" class="headerlink" title="讲解"></a>讲解</h2><p>我们开始进行floyd整个过程的讲解。</p>
+<p>首先，我们定义一个二维数组记录每两个点之间的距离，二维数组的大小取决于图中点的个数。这一步来构建邻接矩阵建立我们的图。我们暂定这个数组名为h。</p>
+<p>对于这个邻接矩阵（也就是该二维数组），我们对其每一个位置进行初始化，将其初始化为一个极大值，代表两点之间无法连通。随后将题目中所给边连接，即将h数组中两点对应的位置设置成题目中所给值。如此，图中直接连通的两点所对应的位置已经不是某无穷大的值了。</p>
+<p>需要提前处理的点都处理好了，接下来就是循环嵌套的过程。</p>
+<p>在这个循环嵌套的过程中，我们完成三重循环，分别是枚举终点起点以及枚举它们之间的中转点（例如1-3连通而1-2以及2-3分别连通，那么2可以叫做1与3的中转点）。我们需要判断起点到终点的距离是否比通过中转点的距离更远，或者说起点到终点所需要花费的值是否大于通过中转点所花费的值。落实到公式上就是这样：</p>
+<pre><code>if(h[i][k]+h[k][j]&lt;h[i][j])
+&#123;
+    h[i][j]=h[i][k]+h[k][j];	//i代表起点，j代表终点，k代表中转点。
+&#125;
+</code></pre>
+<p>我们可以看出来，h数组记录的始终是当前情况下i到j的最短距离。</p>
+<p>那么，我们的三重循环貌似应该是这样的：</p>
+<pre><code>for(int i=1;i&lt;=n;i++)
+&#123;
+    for(int j=1;j&lt;=n;j++)
+    &#123;
+        for(int k=1;k&lt;=n;k++)
+        &#123;
+            if(h[i][k]+h[k][j]&lt;h[i][j])
+            &#123;
+                h[i][j]=h[i][k]+h[k][j];
+            &#125;    
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>你可能看到我说的“貌似”二字，或者看出来了这个三重循环和我一开始写的核心代码之间的不同点。没错，这样的三重循环是不对的，而这个循环嵌套仅仅是把中转点的循环放到了内层。</p>
+<p>这样为什么就会出错呢？我们来看看这个问题。</p>
+<p>原核心代码是把中转点的枚举放在了最外层，我们可以分析得出来，核心代码的意愿是对于每一个中转点，分析每一对起点终点是否可以通过该中转点松弛（当然你也可以叫它优化）。这样对于每一次枚举到的中转点，每对起点终点都会被遍历一次，在最后一个中转点时，仍然还可以修改每对起点终点的最小值。</p>
+<p>而将中转点的枚举放在最内层，我们分析得来，实现过程是对每一对起点终点枚举所有点来当作中转点。这样的话对于这对起点终点来说，属于它们的最外层循环走完之后，它们的最短距离就相对固定了，在之后的循环中再没有对它们的操作了，这会导致错误。</p>
+<p>我们也可以这么理解：我们对于每一个新增的节点k，来判断这个k是否对于已经确定的最短路有什么影响。而随着k的增加，最终达到整张原图的大小，此时k对每条最短路的影响都已经判断完毕了，故此时得到的每两个点之间的最短路就是整张图背景下两个点之间的最短路。</p>
+<p>我们来举几个例子帮助大家理解。（例子取自大佬博客，地址下面放出）</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_27765961/article/details/51915384" title="https://blog.csdn.net/qq_27765961/article/details/51915384">https://blog.csdn.net/qq_27765961&#x2F;article&#x2F;details&#x2F;51915384</a></p>
+<p>例子是取自这篇博客，但是我还是重新画一下图片吧。</p>
+<p>第一个例子是这个样子的</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.4.jpg" alt="floyd-1.1.jpg"></p>
+<p>若把中转点循环放在内层，过程如下：</p>
+<p>未循环时是这样的邻接矩阵。</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.5.jpg" alt="floyd-1.2.jpg"></p>
+<p>i&#x3D;1结束之后变成了这样。</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.6.jpg" alt="floyd-1.3.jpg"></p>
+<p>i&#x3D;2结束之后还是上图那样。</p>
+<p>这样我们就看出来了，1与2之间的距离之后的过程中就不会再更改了，而很明显我们可以从图中看出来最短距离是3。</p>
+<p>为了保险起见，我们把中转点循环在最外层的过程也捋一遍。</p>
+<p>仍然是这俩图。</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.4.jpg" alt="floyd-1.1.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.5.jpg" alt="floyd-1.2.jpg"></p>
+<p>k&#x3D;1结束之后，邻接矩阵没有发生变化。</p>
+<p>k&#x3D;2的时候也是一样的。（规律好像与行列有关）</p>
+<p>k&#x3D;3即3作为中转点的时候发生了变化。</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.7.jpg" alt="floyd-1.7.jpg"></p>
+<p>k&#x3D;4之后最终的邻接矩阵变成了这样。</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-1.8.jpg" alt="floyd-1.8.jpg"></p>
+<p>很明显得到了1与2之间的最短距离为3。</p>
+<p>大家可能发现了，上面这个例子是一个有向图的例子，边只能单向通过，所以我在图中只是画了箭头，而没有画直线。那么，会不会k在内层只是在有向图中错误呢？我们用第二个例子验证一下。</p>
+<p>我在第二个例子中只判断图的连通性，实际上简化了过程，连通则在邻接矩阵中置1，非连通则置0。</p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-3.3.jpg" alt="floyd-3.3.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-3.4.jpg" alt="floyd-3.4.jpg"></p>
+<p>i&#x3D;1时只是与4连通，而i&#x3D;2的时候也只是2与4连通。你可能会说，1和2都与4连通那它们不就连通了，但是程序不知道这点，程序只知道i过了2之后，1和2的连通状态不会再改变了，并且在最后，1和2也是未连通的状态。</p>
+<p>另外，还有几个问题。</p>
+<p>一个是，k在最外层的话，先经历哪一个点为中转点对这个过程有影响吗？换句话说就是顺序是否对floyd产生影响。</p>
+<p>还有一个是关于为何floyd被定义为是动态规划算法。</p>
+<p>这两个问题在下面这篇大佬的博客中有所解释，我就不搬运了，网址放出来。</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/LiHior/p/7701296.html" title="https://www.cnblogs.com/LiHior/p/7701296.html">https://www.cnblogs.com/LiHior/p/7701296.html</a></p>
+<h2 id="标准代码"><a href="#标准代码" class="headerlink" title="标准代码"></a>标准代码</h2><p>我假设一共n个点m条边的无向图做了一个标准代码，仅供参考。</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+#define MAX 99999999
+int h[105][105];
+int main()
+&#123;
+    int n,m;	//n个点,m条边
+    int a,b,v; 
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            h[i][j]=MAX;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;v);
+        h[a][b]=v;
+        h[b][a]=v;
+    &#125; 
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            printf(&quot;%d &quot;,h[i][j]);
+        &#125;
+        printf(&quot;\n&quot;);
+    &#125;
+    for(int k=1;k&lt;=n;k++)
+    &#123;
+        for(int i=1;i&lt;=n;i++)
+        &#123;
+            for(int j=1;j&lt;=n;j++)
+            &#123;
+                if(h[i][k]+h[k][j]&lt;h[i][j])
+                &#123;
+                    h[i][j]=h[i][k]+h[k][j];
+                    h[j][i]=h[i][k]+h[k][j];
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            printf(&quot;%d &quot;,h[i][j]);
+        &#125;
+        printf(&quot;\n&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>floyd的逻辑很清晰，相信大家自己也可以一步一步走出每一步的作用。另外在上面已经尝试着分析过一段核心代码了，在这里我就不对标准代码做讲解了。</p>
+<h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><h3 id="HDU-2544-最短路"><a href="#HDU-2544-最短路" class="headerlink" title="HDU 2544 最短路"></a>HDU 2544 最短路</h3><p>就是一个模板的单源最短路。</p>
+<h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p><a href="acm.hdu.edu.cn/showproblem.php?pid=2544" title="acm.hdu.edu.cn/showproblem.php?pid=2544">acm.hdu.edu.cn&#x2F;showproblem.php?pid&#x3D;2544</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/19/floyd-4.1.jpg" alt="floyd-4.1.jpg"></p>
+<h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><p>就是个很普通的单源最短路，按照正常的流程，初始化，核心就可以解决。需要注意的点有一个，就是题目中说C&lt;&#x3D;1000，是不准确的，需要把最大值调整到200000。</p>
+<h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><pre><code>#include&lt;stdio.h&gt;
+#define MAX 200005
+int main()
+&#123;
+    int n,m;
+    int a,b,c;
+    int h[105][105];
+    while(1)
+    &#123;	
+        scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+        if(n==0&amp;&amp;m==0)
+        &#123;
+            break;
+        &#125;
+        for(int i=1;i&lt;=n;i++)
+        &#123;
+            for(int j=1;j&lt;=n;j++)
+            &#123;
+                h[i][j]=MAX;
+            &#125;
+        &#125;
+        for(int i=1;i&lt;=m;i++)
+        &#123;
+            scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+            h[a][b]=c;
+            h[b][a]=c;
+        &#125;
+        for(int k=1;k&lt;=n;k++)
+        &#123;
+            for(int i=1;i&lt;=n;i++)
+            &#123;
+                for(int j=1;j&lt;=n;j++)
+                &#123;
+                    if(h[i][j]&gt;h[i][k]+h[k][j])
+                    &#123;
+                        h[i][j]=h[i][k]+h[k][j];
+                        h[j][i]=h[i][j];
+                    &#125;	
+                &#125;
+            &#125;
+        &#125;
+        printf(&quot;%d\n&quot;,h[1][n]);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h3 id="洛谷-P2910-USACO08OPEN-寻宝之路Clear-And-Present-Danger"><a href="#洛谷-P2910-USACO08OPEN-寻宝之路Clear-And-Present-Danger" class="headerlink" title="洛谷 P2910 [USACO08OPEN]寻宝之路Clear And Present Danger"></a>洛谷 P2910 [USACO08OPEN]寻宝之路Clear And Present Danger</h3><h4 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P2910" title="https://www.luogu.org/problem/P2910">https://www.luogu.org/problem/P2910</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/21/floyd-5.1.jpg" alt="floyd-5.1.jpg"></p>
+<h4 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h4><p>首先题目中提及，a到b的危险指数不一定等于b到a的危险指数，可知是有向图。</p>
+<p>另外，本题的输入给出了整个邻接矩阵，并且特别指出了每个岛到自己本身的危险程度为0。我们不需要对邻接矩阵赋极大的初值了。</p>
+<p>最后，我们要在一开始记录下路线，并且在floyd核心运行完毕之后，对每一对相邻的点的危险程度进行求和。所得到的值就是最后的危险指数。</p>
+<p>别的就没啥好说的了，就是一个很普通很裸的floyd，多源最短路嘛。</p>
+<h4 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h4><pre><code>#include&lt;stdio.h&gt;
+int main()
+&#123;	
+    int n,m,v;
+    int sum=0;
+    int a[10005];
+    int h[105][105];
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;a[i]);
+    &#125;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            scanf(&quot;%d&quot;,&amp;v);
+            h[i][j]=v;
+        &#125;
+    &#125;
+    for(int k=1;k&lt;=n;k++)
+    &#123;
+        for(int i=1;i&lt;=n;i++)
+        &#123;
+            for(int j=1;j&lt;=n;j++)
+            &#123;
+                if(h[i][k]+h[k][j]&lt;h[i][j])
+                &#123;
+                    h[i][j]=h[i][k]+h[k][j];
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=m-1;i++)
+    &#123;
+        sum+=h[a[i]][a[i+1]];
+        &#125;
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<h3 id="洛谷-P2935-USACO09JAN-最好的地方Best-Spot"><a href="#洛谷-P2935-USACO09JAN-最好的地方Best-Spot" class="headerlink" title="洛谷 P2935 [USACO09JAN]最好的地方Best Spot"></a>洛谷 P2935 [USACO09JAN]最好的地方Best Spot</h3><h4 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P2935" title="https://www.luogu.org/problem/P2935">https://www.luogu.org/problem/P2935</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/21/floyd-6.1.jpg" alt="floyd-6.1.jpg"></p>
+<h4 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h4><p>题目一开始也是提及，连通的路都是双向边，所以是一个无向图。</p>
+<p>据题意所说，我们需要得到每一个牧场到其他牧场的最短路，然后再求出每一个牧场到某些特定牧场最短距离的平均值最后选一个平均值最小的。也是一个典型的多源最短路，最短路的过程也不再说了。</p>
+<p>题目中说最多500个点，却只有最多8000条边，我们把整个邻接矩阵初始化，随后记录特定的牧场都有哪些。</p>
+<p>而在最后加和求平均值的过程中要注意，若由某牧场到某牧场本身，则跳过加和，因为距离应该为0，但实际上在一开始我们给邻接矩阵赋上了初值，无论最后有没有得到松弛，都会影响最终结果。</p>
+<h4 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h4><pre><code>#include&lt;stdio.h&gt;
+#define MAX 100005
+int main()
+&#123;
+    int p,f,c;
+    int a,b,v;
+    int aver;
+    int ans;
+    int min=1000005;
+    int want[505];
+    int h[505][505];
+    scanf(&quot;%d%d%d&quot;,&amp;p,&amp;f,&amp;c);
+    for(int i=1;i&lt;=f;i++)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;want[i]);
+    &#125;
+    for(int i=1;i&lt;=p;i++)
+    &#123;
+        for(int j=1;j&lt;=p;j++)
+        &#123;
+            h[i][j]=MAX;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=c;i++)
+    &#123;
+        scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;v);
+        h[a][b]=v;
+        h[b][a]=v;
+    &#125;
+    for(int k=1;k&lt;=p;k++)
+    &#123;
+        for(int i=1;i&lt;=p;i++)
+        &#123;
+            for(int j=1;j&lt;=p;j++)
+            &#123;
+                if(h[i][k]+h[k][j]&lt;h[i][j])
+                &#123;
+                    h[i][j]=h[i][k]+h[k][j];
+                    h[j][i]=h[i][j];
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=p;i++)
+    &#123;
+        aver=0;
+        for(int j=1;j&lt;=f;j++)
+        &#123;
+            if(i!=want[j])
+            &#123;
+                    aver+=h[i][want[j]];
+            &#125;	
+        &#125;
+        if(aver&lt;min)
+        &#123;
+            min=aver;
+            ans=i;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,ans);
+    return 0;
+&#125;
+</code></pre>
+<h3 id="洛谷-P2888-USACO07NOV-牛栏Cow-Hurdles"><a href="#洛谷-P2888-USACO07NOV-牛栏Cow-Hurdles" class="headerlink" title="洛谷 P2888 [USACO07NOV]牛栏Cow Hurdles"></a>洛谷 P2888 [USACO07NOV]牛栏Cow Hurdles</h3><h4 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P2888" title="https://www.luogu.org/problem/P2888">https://www.luogu.org/problem/P2888</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/21/floyd-7.1.jpg" alt="floyd-7.1.jpg"></p>
+<h4 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h4><p>这道题的floyd稍微有一点隐晦，没有直接指出最短路，而是一条路上最大的花费等于这条路的花费，不断松弛找到每两个点之间最高的栏（最大的花费）的最小值（最大花费最小的那条路）。</p>
+<p>做这道题我们只需要把floyd的核心代码中的判断稍微修改一下。</p>
+<p>题目中提及单向路径，故是一个有向图。</p>
+<p>题目中给出了多个任务，故也可以看出是一个多源问题。</p>
+<p>最后，有可能无法到达，也就是无法满足任务，输出-1，我把这里定成了栏的高度大于某个值就不满足，因为我在初始化时，用了一个极大值来记录无法通过的路径。</p>
+<h4 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h4><pre><code>#include&lt;stdio.h&gt;
+#define MAX 1000010
+int max(int a1,int b1)
+&#123;
+    if(a1&gt;b1)
+    &#123;
+        return a1;
+    &#125;
+    else
+    &#123;
+        return b1;
+    &#125;
+&#125;
+int main()
+&#123;
+    int n,m,t;
+    int a,b,c;
+    int h[305][305];
+    scanf(&quot;%d%d%d&quot;,&amp;n,&amp;m,&amp;t);
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            h[i][j]=MAX;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+        h[a][b]=c;
+    &#125;
+    for(int k=1;k&lt;=n;k++)
+    &#123;
+        for(int i=1;i&lt;=n;i++)
+        &#123;
+            for(int j=1;j&lt;=n;j++)
+            &#123;
+                if(max(h[i][k],h[k][j])&lt;=h[i][j])
+                &#123;
+                    h[i][j]=max(h[i][k],h[k][j]);
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=t;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        if(h[a][b]&lt;=1000000)
+        &#123;
+            printf(&quot;%d\n&quot;,h[a][b]);
+        &#125;
+        else
+        &#123;
+            printf(&quot;-1\n&quot;);
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h1 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/Floyd/">http://www.unknown9t.com/2022/04/29/Floyd/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/bfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/" title="bfs习题讲解"><span>< PreviousPost</span><br><span class="prevTitle">bfs习题讲解</span></a><a class="nextSlogan" href="/2022/04/29/dfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/" title="dfs习题讲解"><span>NextPost ></span><br><span class="nextTitle">dfs习题讲解</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B2%E8%A7%A3"><span class="toc-number">2.1.</span> <span class="toc-text">讲解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E5%87%86%E4%BB%A3%E7%A0%81"><span class="toc-number">2.2.</span> <span class="toc-text">标准代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E9%A2%98"><span class="toc-number">2.3.</span> <span class="toc-text">例题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HDU-2544-%E6%9C%80%E7%9F%AD%E8%B7%AF"><span class="toc-number">2.3.1.</span> <span class="toc-text">HDU 2544 最短路</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.3.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">2.3.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P2910-USACO08OPEN-%E5%AF%BB%E5%AE%9D%E4%B9%8B%E8%B7%AFClear-And-Present-Danger"><span class="toc-number">2.3.2.</span> <span class="toc-text">洛谷 P2910 [USACO08OPEN]寻宝之路Clear And Present Danger</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-1"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-1"><span class="toc-number">2.3.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">2.3.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P2935-USACO09JAN-%E6%9C%80%E5%A5%BD%E7%9A%84%E5%9C%B0%E6%96%B9Best-Spot"><span class="toc-number">2.3.3.</span> <span class="toc-text">洛谷 P2935 [USACO09JAN]最好的地方Best Spot</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-2"><span class="toc-number">2.3.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-2"><span class="toc-number">2.3.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-2"><span class="toc-number">2.3.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P2888-USACO07NOV-%E7%89%9B%E6%A0%8FCow-Hurdles"><span class="toc-number">2.3.4.</span> <span class="toc-text">洛谷 P2888 [USACO07NOV]牛栏Cow Hurdles</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-3"><span class="toc-number">2.3.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-3"><span class="toc-number">2.3.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-3"><span class="toc-number">2.3.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD%E2%80%A6"><span class="toc-number">3.</span> <span class="toc-text">未完待续…</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

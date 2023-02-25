@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1>Tang</h1><h5>永不止息</h5><div class="intro-social"><a class="fa fa-qq" href="//www.z4a.net/image/7pHEs5" target="_blank" title="qq"></a><a class="fa fa-wechat" href="//www.z4a.net/image/7pH9Wi" target="_blank" title="wechat"></a></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><section id="recent-posts"><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/%E5%B8%B8%E8%A7%81%E7%B4%A0%E6%95%B0%E7%AD%9B/">常见素数筛</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:54:56.310Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在数学的王国里，质数（也即素数）是数这个范围内一枚闪闪发光的重要宝石，很多公式和定理都与素数有关。这样，如何判断一个数是否是素数也是一个重要的问题，只不过这个问题的解法相当显而易见，那么我们的目光就要更多的放在对于判断素数的算法的性能的优化上了（更多的是时间复杂度）。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="数论"> 数论</a></div><div class="read-more"><a class="more" href="/2022/04/29/%E5%B8%B8%E8%A7%81%E7%B4%A0%E6%95%B0%E7%AD%9B/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/%E9%80%92%E6%8E%A8%E7%AE%97%E6%B3%95/">递推算法</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:54:40.249Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>递推算法作为基础算法之一，递推的思想不难理解，难点在于多变的递推公式以及找寻递推关系时蕴含的数学的思维。由于递推算法的关键问题是得到递推关系，这种关系是一种高效的数学模型（ACM-ICPC基本算法中是这么说的），而且又灵活多变，为递推算法题目的解决带来了不少困难。所以，我认为有必要开专题对常见递推思路进行列举讲解，顺带着讲解一下递推算法的基础知识。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="递推"> 递推</a></div><div class="read-more"><a class="more" href="/2022/04/29/%E9%80%92%E6%8E%A8%E7%AE%97%E6%B3%95/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/%E5%B9%B6%E6%9F%A5%E9%9B%86/">并查集</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:51:36.521Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>正如百度百科所说，并查集是一种树形的数据结构，并且用于处理一些不相交集合的合并及查询问题。一般地来说，并查集由两个部分组成，一个是查找要操作的两个集合是否属于同一个，另一个则是进行这两个集合合并的过程。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="数据结构"> 数据结构</a></div><div class="read-more"><a class="more" href="/2022/04/29/%E5%B9%B6%E6%9F%A5%E9%9B%86/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/bfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/">bfs习题讲解</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:49:21.752Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究是心有余力不足。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="bfs"> bfs</a></div><div class="read-more"><a class="more" href="/2022/04/29/bfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/Floyd/">Floyd（弗洛伊德）</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:49:08.120Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>到了如今，最短路问题已经得到了很多种解法。这些解法有相同的地方，也有不同的地方，性能也有所差异。但是，如果一种问题得出的某种解法优于其他解法太多，其他这些解法就应该随时间流逝而被逐渐淘汰。最短路问题的这些解法如今仍屹立不倒，足可说明它们各有偏重的方向。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="图论"> 图论</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="最短路"> 最短路</a></div><div class="read-more"><a class="more" href="/2022/04/29/Floyd/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/dfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/">dfs习题讲解</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:45:06.810Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究是心有余力不足。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="dfs"> dfs</a></div><div class="read-more"><a class="more" href="/2022/04/29/dfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/dfs%E4%B8%8Ebfs%E7%AE%80%E5%8D%95%E8%BE%A8%E6%9E%90/">dfs与bfs简单辨析</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:44:02.936Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>dfs即深度优先搜索(deep first search)与bfs即宽度优先搜索(breadth first search)究竟有哪些不同，本文将会依据我自己的理解，做出一定深度的阐述。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="dfs"> dfs</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="bfs"> bfs</a></div><div class="read-more"><a class="more" href="/2022/04/29/dfs%E4%B8%8Ebfs%E7%AE%80%E5%8D%95%E8%BE%A8%E6%9E%90/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7%E7%B2%BE%E9%80%89/">常用技巧精选</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:35:55.191Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>本文所涉及的多种技巧，出自秋叶拓哉的《挑战程序设计》一书。译者提及这些技巧的应用范围都比书中所介绍的模型要广泛，我们应该注重算法技巧中蕴含的算法思想以及思维方式。许多看似复杂困难的问题，关键都可以运用看似简单的技巧处理。我查询网上对于这些技巧的解释，希望能够深化这种技巧蕴含的思想，并且将其变为自己的东西。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法技巧"> 算法技巧</a></div><div class="read-more"><a class="more" href="/2022/04/29/%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7%E7%B2%BE%E9%80%89/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">二分查找</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:33:00.885Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这篇文章所要讲的二分查找，是一种效率很高的查找方法。二分查找可以将查找的时间复杂度降至*O(log2n)*，但是它要求所查找的数列至少是有序数列。在大部分题目中，这个数列会被规定为有序且连续，但在某些题目中，数列不是连续的，而如果无法查找到，则输出固定语句。这些大同小异，但是用二分查找的前提一定是该数列有序。 </p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="查找算法"> 查找算法</a></div><div class="read-more"><a class="more" href="/2022/04/29/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/#more">ReadMore</a></div><hr></div><div class="recent-post-item"><div class="post-title"><a href="/2022/04/29/%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8OJ%E5%B9%B3%E5%8F%B0/">个人常用OJ平台</a></div><div class="post-time"><i class="fa fa-table"></i><time datetime="2022-04-29T13:19:00.508Z">2022-04-29</time></div><div class="recent-post-content"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>最近在搜其他博客所需要的例题时，惊奇的发现原来OJ平台极多，而且仍有一些很有价值，很美观的OJ平台我并没有发现，或者说发现了却经常忘记用。所以，在这篇博文中我将记载一些个人觉得有必要记录的网站，并且分列它们的特点（每一个OJ平台都不是十全十美的，我觉得一个网站有些不足也是特色）。</p></div><div class="recent-post-tags"><a class="post-tag fa fa-tag" href="javascript:void(0)" date-tags="杂论"> 杂论</a></div><div class="read-more"><a class="more" href="/2022/04/29/%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8OJ%E5%B9%B3%E5%8F%B0/#more">ReadMore</a></div><hr></div></section><nav class="cxo-page-nav"><span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">NEXT &amp;#62;</a></nav></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

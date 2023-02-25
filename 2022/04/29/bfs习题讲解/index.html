@@ -1,0 +1,1043 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>bfs习题讲解 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">bfs习题讲解</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="bfs"> bfs</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究是心有余力不足。</p>
+<span id="more"></span>
+
+<p>在这篇博客中我将根据具体例题讲解部分bfs思路，正如上面所说，思想和实现能力是相辅相成的，我在这里理清了思路，还需要进行一个系列题目的练习，才能说把思路巩固了。如果有能力再进行高级的练习以及对于题目变形的解答。我希望在讲解的过程中也可以教学相长，如有错漏还请不吝赐教。</p>
+<p>另外我有一些地方用到了结构体，不太明白的同学可以查一查，其实不难理解。</p>
+<h1 id="正文（例题）"><a href="#正文（例题）" class="headerlink" title="正文（例题）"></a>正文（例题）</h1><h2 id="洛谷-P1746-离开中山路"><a href="#洛谷-P1746-离开中山路" class="headerlink" title="洛谷 P1746 离开中山路"></a>洛谷 P1746 离开中山路</h2><p>一个很简单的地图bfs</p>
+<h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1746" title="https://www.luogu.org/problem/P1746">https://www.luogu.org/problem/P1746</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.1.jpg" alt="bfs-1.1.jpg"></p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>一个字符型数组录入整张地图，然后从起始点出发。</p>
+<p>我们以题目所给样例作解答。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.2.jpg" alt="bfs-1.2.jpg"></p>
+<p>按照样例我们来直观地画一张图：</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.3.jpg" alt="bfs-1.3.jpg"></p>
+<p>此时我们建立一个队列数组，用来存放需要入队出队的位置，也就是被搜索到的位置，bfs不像dfs那样直接在dfs函数中调用，所以需要一个数组来决定它们执行搜索的先后顺序，我们也同样把这个队列数组画出来。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.4.jpg" alt="bfs-1.4.jpg"></p>
+<p>实现模拟队列的时候，与栈不同的是，队列需要两个变量，一个名叫head，一个叫tail，分别代表着队列的队头和队尾，只有队头和队尾中间才是队列的范围，当有数据需要入队，就令队尾自加，然后把数据加入，当有数据需要出队，则使队头自加即可。</p>
+<p>那有的人就会说了，这样做数组的空间很浪费，所以才会出现了循环队列以及用链表实现的方法，这些暂时不会用到，所以仅在此提及一下。</p>
+<p>接下来，我们来讲解这道题具体的bfs过程。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.5.jpg" alt="bfs-1.5.jpg"></p>
+<p>我们先把起始点[1][1]入队，此时的head和tail初始化都赋值为1。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.6.jpg" alt="bfs-1.6.jpg"></p>
+<p>此时开始只要head&lt;&#x3D;tail就不断循环调用bfs函数，从队列中的队头元素开始，对[1][1]这个点的四个方向进行枚举判断，发现仅右侧即[1][2]这个位置可以入队，故将该点入队。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.7.jpg" alt="bfs-1.7.jpg"></p>
+<p>随后此次bfs过程结束，我们把这次bfs搜索过的点出队。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.8.jpg" alt="bfs-1.8.jpg"></p>
+<p>按照如此的过程，把[2][2]这个位置入队。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.10.jpg" alt="bfs-1.10.jpg"></p>
+<p>然后到最后，按照我的代码思路，最后会是这样。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.11.jpg" alt="bfs-1.11.jpg"></p>
+<p>因为在执行[3][2]这个bfs的时候，向四周搜索会直接发现终点[3][3]，按照我的代码思路，此时应该将某个标记设置成1然后直接跳出，之后的过程由于某标记已经置1所以不用再执行了。而有些查找可能路径的题目则或许不用半路跳出，则只需等head&gt;tail之后自动跳出循环即可。</p>
+<p>另外在最终我们需要找出终点距起点的最短距离，那么我们只需要在每个点记录当前点的距离，然后对于每个由该点引出的，先前未被搜索过的点，只需将该距离加1即可。</p>
+<p>如图。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-1.12.jpg" alt="bfs-1.12.jpg"></p>
+<p>当然在搜索过程中，已经搜索过的位置就不需要再次搜索了，因为在bfs过程中，某一个位置的最近到达所需距离就是它第一次被搜索到的时候的距离，多次搜索替换这个距离的话有可能造成错误，也浪费时间。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int mapv[1005][1005]=&#123;0&#125;;
+char map[1005][1005];
+struct que
+&#123;
+    int x;
+    int y;
+    int sec;
+&#125;que[2000005];
+int n;
+int pd;
+int head,tail;
+int x1,y1,x2,y2;
+int xa[5]=&#123;-1,0,1,0&#125;;
+int ya[5]=&#123;0,-1,0,1&#125;;
+void bfs(int q)
+&#123;
+    for(int i=0;i&lt;=3;i++)
+    &#123;
+        if((que[q].x+xa[i])&gt;=0&amp;&amp;(que[q].x+xa[i])&lt;=n-1&amp;&amp;(que[q].y+ya[i])&gt;=0&amp;&amp;(que[q].	+ya[i])&lt;=n-1)
+        &#123;
+            if((que[q].x+xa[i])==x2-1&amp;&amp;(que[q].y+ya[i])==y2-1)
+            &#123;
+                pd=1;
+                printf(&quot;%d\n&quot;,que[q].sec+1);
+                return;
+            &#125;
+            if(mapv[que[q].x+xa[i]][que[q].y+ya[i]]==0&amp;&amp;map[que[q].x+xa[i]][que[q].y+ya[i]]==&#39;0&#39;)
+            &#123;
+                tail++;
+                que[tail].x=que[q].x+xa[i];
+                que[tail].y=que[q].y+ya[i];
+                que[tail].sec=que[q].sec+1;
+                mapv[que[q].x+xa[i]][que[q].y+ya[i]]=1;
+            &#125;
+        &#125;	
+    &#125;
+&#125;
+int main()
+&#123;
+    head=1,tail=1;
+    pd=0;
+    scanf(&quot;%d&quot;,&amp;n);	
+    for(int i=0;i&lt;=n-1;i++)
+    &#123;
+        scanf(&quot;%s&quot;,map[i]);
+    &#125;
+    scanf(&quot;%d%d%d%d&quot;,&amp;x1,&amp;y1,&amp;x2,&amp;y2);
+    que[1].x=x1-1;
+    que[1].y=y1-1;
+    que[1].sec=0;
+    if(x1==x2&amp;&amp;y1==y2)
+    &#123;
+        printf(&quot;0&quot;);
+        return 0;
+    &#125;
+    while(head&lt;=tail)
+    &#123;
+        bfs(head);
+        head++;
+        if(pd==1)
+        &#123;
+            break;
+        &#125;
+    &#125;
+    return 0;
+&#125; 
+</code></pre>
+<h2 id="洛谷-P1443-马的遍历"><a href="#洛谷-P1443-马的遍历" class="headerlink" title="洛谷 P1443 马的遍历"></a>洛谷 P1443 马的遍历</h2><p>对整张地图所有点进行搜索，找最短能到达的距离。</p>
+<h3 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1443" title="https://www.luogu.org/problem/P1443">https://www.luogu.org/problem/P1443</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-2.1.jpg" alt="bfs-2.1.jpg"></p>
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>棋盘上马走日，所以对于一般上下左右的四个点变成了另外的点。</p>
+<p>有些点是走不到的，输出格式要求不能到达则输出-1，我们可以把记录整张地图最少步数的二维数组初始化为-1。另外题目要求左对齐，宽5格。</p>
+<p>与普通的题目类似，只需不断进行bfs即可。</p>
+<p>下面以题目样例为例讲解过程。</p>
+<p>起始点是[1][1]，我们首先将该点入队，并且进行基本的初始化。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-2.2.jpg" alt="bfs-2.2.jpg"></p>
+<p>随后，对于该点可跳到的点进行枚举判断，随后tail自加两次并且分别入栈[2][3] [3][2]，[1][1]出队，head自加。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-2.4.jpg" alt="bfs-2.4.jpg"></p>
+<p>我们可以看到这两个新入队的点，步数都为1，都是由0+1得来的。</p>
+<p>随后对队头元素([2][3])可跳到的点进行枚举判断。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-2.5.jpg" alt="bfs-2.5.jpg"></p>
+<p>[2][3]可以跳到[1][1]以及[3][1]这两个地图中的位置，但是由于[1][1]已经走过了，故不再入队，只将[3][1]入队，并且head自加，代表[2][3]这个点的bfs已经完成。</p>
+<p>最后整个队列应该是这样子的。</p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-2.6.jpg" alt="bfs-2.6.jpg"></p>
+<p>随后head自加，再一次的循环中，head比tail大了，故能走到的点已经走完了，跳出了循环，地图上也已经打好了标记，没有走到的按照初始值是-1，这样就满足了题目的条件。</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int a[405][405];
+int n,m;
+int l=1;
+int r=1;
+int sx,sy;
+int xa[10]=&#123;1,2,2,1,-1,-2,-2,-1&#125;;
+int ya[10]=&#123;2,1,-1,-2,2,1,-1,-2&#125;;
+struct b
+&#123;
+    int x1;
+    int y1;
+    int bu;
+&#125;b[40001];
+void bfs(int x,int y,int bs)
+&#123;
+    for(int t=0;t&lt;=7;t++)
+    &#123;
+        if(a[x+xa[t]][y+ya[t]]==-1&amp;&amp;x+xa[t]&gt;0&amp;&amp;x+xa[t]&lt;n+1&amp;&amp;y+ya[t]&gt;0&amp;&amp;y+ya[t]&lt;m+1)
+        &#123;
+            r++;
+            b[r].x1=x+xa[t];
+            b[r].y1=y+ya[t];
+            b[r].bu=bs+1;
+            a[x+xa[t]][y+ya[t]]=bs+1;
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    int i,j;
+    scanf(&quot;%d%d%d%d&quot;,&amp;n,&amp;m,&amp;sx,&amp;sy);
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=1;j&lt;=m;j++)
+        &#123;
+            a[i][j]=-1;
+        &#125;
+    &#125;
+    b[1].x1=sx;
+    b[1].y1=sy;
+    b[1].bu=0;
+    a[sx][sy]=0;
+    while(l&lt;=r)
+    &#123;
+        bfs(b[l].x1,b[l].y1,b[l].bu);
+        l++;
+    &#125;	
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=1;j&lt;=m;j++)
+        &#123;
+            printf(&quot;%-5d&quot;,a[i][j]);
+        &#125;
+        printf(&quot;\n&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1747-好奇怪的游戏"><a href="#洛谷-P1747-好奇怪的游戏" class="headerlink" title="洛谷 P1747 好奇怪的游戏"></a>洛谷 P1747 好奇怪的游戏</h2><p>就是两遍bfs，并且一个点的可选点位变成了八个。</p>
+<h3 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1747" title="https://www.luogu.org/problem/P1747">https://www.luogu.org/problem/P1747</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/13/bfs-3.1.jpg" alt="bfs-3.1.jpg"></p>
+<h3 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h3><p>这题当时做的时候没有太仔细想，我的做法就是一遍bfs之后把该初始化的全部初始化再进行一遍bfs。</p>
+<p>具体bfs的实施过程也就是一个八个可能点位的普通地图bfs，就不在这里多说的，过程的话大概也都能明白。</p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+int mapw[30][30]=&#123;0&#125;;
+int xa[15]=&#123;-2,-2,-1,1,2,2,2,2,1,-1,-2,-2&#125;;
+int ya[15]=&#123;1,2,2,2,2,1,-1,-2,-2,-2,-2,-1&#125;;
+int head,tail;
+int pd;
+struct que
+&#123;
+    int x1;
+    int y1;
+    int leap1;
+&#125;que[4005];
+void bfs(int q)
+&#123;
+    for(int i=0;i&lt;=11;i++)
+    &#123;
+        if(que[q].x1+xa[i]==1&amp;&amp;que[q].y1+ya[i]==1)
+        &#123;
+            pd=1;
+            printf(&quot;%d\n&quot;,que[q].leap1+1);
+            return;
+        &#125;
+        if((que[q].x1+xa[i])&gt;=1&amp;&amp;(que[q].x1+xa[i])&lt;=20&amp;&amp;(que[q].y1+ya[i])&gt;=1&amp;&amp;(que[q].y1+ya[i])&lt;=20)
+        &#123;
+            if(mapw[que[q].x1+xa[i]][que[q].y1+ya[i]]==0)
+            &#123;
+                mapw[que[q].x1+xa[i]][que[q].y1+ya[i]]=1;
+                tail++;
+                que[tail].x1=que[q].x1+xa[i];
+                que[tail].y1=que[q].y1+ya[i];
+                que[tail].leap1=que[q].leap1+1;
+            &#125;		
+        &#125;	
+    &#125;	
+&#125;
+int main()
+&#123;
+    int x[5];
+    int y[5];	
+    scanf(&quot;%d%d%d%d&quot;,&amp;x[1],&amp;y[1],&amp;x[2],&amp;y[2]);
+    for(int t=1;t&lt;=2;t++)
+    &#123;	
+        memset(mapw,0,sizeof(mapw));
+        head=1;
+        tail=1;
+        pd=0;
+        que[1].x1=x[t];
+        que[1].y1=y[t];
+        que[1].leap1=0;
+        if(x[t]==1&amp;&amp;y[t]==1)
+        &#123;
+            printf(&quot;0\n&quot;);
+            continue;
+        &#125;
+        while(head&lt;=tail)
+        &#123;
+            bfs(head);
+            head++;
+            if(pd==1)
+            &#123;
+                break;
+            &#125;
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1135-奇怪的电梯"><a href="#洛谷-P1135-奇怪的电梯" class="headerlink" title="洛谷 P1135 奇怪的电梯"></a>洛谷 P1135 奇怪的电梯</h2><p>这感觉上也算个地图型bfs了吧，我第一个打的bfs，思路可能有点乱，然后当时脑子也不咋清楚。</p>
+<h3 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1135" title="https://www.luogu.org/problem/P1135">https://www.luogu.org/problem/P1135</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-4.1.jpg" alt="bfs-4.1.jpg"></p>
+<h3 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h3><p>就类地图型bfs，不同的是没有明显地图，然后每个点有两个选择。</p>
+<p>另外和地图一样，这题目也是有边界的，需要谨慎处理这个边界的情况。</p>
+<h3 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int d[100005];   		//bfs的层数组（队列） 
+int cs[100005]=&#123;0&#125;;		//第几次按电梯到达第i层 
+int c[205];				//第i层所记录的数字 
+int q[205]=&#123;0&#125;;
+int gb[5]=&#123;-1,1&#125;;
+int head,tail;
+int a,b,n;
+int pd=0;
+void bfs(int ceng)
+&#123;
+    if(q[d[ceng]]==0)
+    &#123;
+        q[d[ceng]]=1;
+        for(int i=0;i&lt;=1;i++)
+        &#123;
+            if(d[ceng]+gb[i]*c[d[ceng]]&lt;=n&amp;&amp;d[ceng]+gb[i]*c[d[ceng]]&gt;=1)
+            &#123;
+                tail++;
+                d[tail]=d[ceng]+gb[i]*c[d[ceng]];
+                cs[tail]=cs[ceng]+1;
+                if(d[tail]==b)
+                &#123;
+                    pd=1;
+                    return;
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+&#125; 	
+int main()
+&#123;	
+    scanf(&quot;%d%d%d&quot;,&amp;n,&amp;a,&amp;b);
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;c[i]);
+    &#125;
+    head=1;
+    tail=1;
+    q[a]=0;
+    d[1]=a;
+    cs[a]=0;
+    if(a==b)
+    &#123;
+        printf(&quot;0&quot;);
+        return 0;
+    &#125;
+    while(head&lt;=tail)
+    &#123;
+        bfs(head);
+        head++;
+        if(pd==1)
+        &#123;
+            printf(&quot;%d&quot;,cs[tail]);
+            return 0;
+        &#125;
+    &#125;
+    printf(&quot;-1&quot;);
+    return 0;
+&#125;	
+</code></pre>
+<h2 id="洛谷-P1825-USACO11OPEN-玉米田迷宫Corn-Maze"><a href="#洛谷-P1825-USACO11OPEN-玉米田迷宫Corn-Maze" class="headerlink" title="洛谷 P1825 [USACO11OPEN]玉米田迷宫Corn Maze"></a>洛谷 P1825 [USACO11OPEN]玉米田迷宫Corn Maze</h2><p>在地图型bfs的基础上增加了传送门。</p>
+<h3 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1825" title="https://www.luogu.org/problem/P1825">https://www.luogu.org/problem/P1825</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-5.1.jpg" alt="bfs-5.1.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-5.2.jpg" alt="bfs-5.2.jpg"></p>
+<h3 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h3><p>看题可知，传送门只会成对出现，并且与二十六个大写英文字母一一对应，不会出现一个字母对应两组传送门的情况。</p>
+<p>并且，传送门可以来回传送，但是这里有一个小坑，就是当你到达传送门所在位置的时候，必须执行传送操作，而你再想传送回来，则需要在对面的传送门向外走出一格再走回来。</p>
+<p>当时写这道题的时候在这个坑这里倒了快一个小时，分析数据和结果分析出来的。</p>
+<p>然后代码写得比较乱，看bfs函数里面的标记已走过位置的时候可能无法理解…反正看懂了大概思路就行，这些小细节因人而异。</p>
+<h3 id="代码-4"><a href="#代码-4" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int mapv[505][505]=&#123;0&#125;;
+char map[505][505];
+int trans[255][5]=&#123;0&#125;;
+struct que
+&#123;
+    int x;
+    int y;
+    int sec;
+&#125;que[500005];
+int pd=0;
+int m,n;
+int begi,begj;
+int head,tail;
+int xa[5]=&#123;-1,0,1,0&#125;;
+int ya[5]=&#123;0,-1,0,1&#125;;
+void bfs(int q)
+&#123;
+    for(int i=0;i&lt;=3;i++)
+    &#123;
+        if((que[q].x+xa[i])&gt;=0&amp;&amp;(que[q].x+xa[i])&lt;=n-1&amp;&amp;(que[q].y+ya[i])&gt;=0&amp;&amp;(que[q].y+ya[i])&lt;=m-1)
+        &#123;
+            if(map[que[q].x+xa[i]][que[q].y+ya[i]]==&#39;=&#39;)
+            &#123;
+                pd=1;
+                printf(&quot;%d\n&quot;,que[q].sec+1);
+                return;
+            &#125;
+            if(mapv[que[q].x+xa[i]][que[q].y+ya[i]]==0&amp;&amp;map[que[q].x+xa[i]][que[q].y+ya[i]]!=&#39;#&#39;)
+            &#123;
+                if(map[que[q].x+xa[i]][que[q].y+ya[i]]&gt;=&#39;A&#39;&amp;&amp;map[que[q].x+xa[i]][que[q].y+ya[i]]&lt;=&#39;Z&#39;)
+                &#123;
+                    tail++;
+                    if((que[q].x+xa[i]+1)*m+que[q].y+ya[i]==trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][1])
+                    &#123;
+                        que[tail].x=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][2]/m-1;
+                        que[tail].y=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][2]%m;
+                        que[tail].sec=que[q].sec+1;
+                    &#125;	
+                    else
+                    &#123;
+                        que[tail].x=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][1]/m-1;
+                        que[tail].y=trans[map[que[q].x+xa[i]][que[q].y+ya[i]]][1]%m;
+                        que[tail].sec=que[q].sec+1;
+                    &#125;
+                    que[tail].sec=que[q].sec+1;
+                &#125;
+                else
+                &#123;
+                    tail++;
+                    que[tail].x=que[q].x+xa[i];
+                    que[tail].y=que[q].y+ya[i];
+                    que[tail].sec=que[q].sec+1;	
+                    mapv[que[q].x+xa[i]][que[q].y+ya[i]]=1;
+                &#125;
+
+            &#125;
+        &#125;
+    &#125;
+&#125;	
+int main()
+&#123;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=0;i&lt;=n-1;i++)
+    &#123;
+        scanf(&quot;%s&quot;,map[i]);
+    &#125;
+    for(int i=0;i&lt;=n-1;i++)
+    &#123;
+        for(int j=0;j&lt;=m-1;j++)
+        &#123;
+            if(map[i][j]==&#39;@&#39;)
+            &#123;
+                begi=i;
+                begj=j;
+            &#125;
+            if(map[i][j]&gt;=&#39;A&#39;&amp;&amp;map[i][j]&lt;=&#39;Z&#39;)
+            &#123;
+                if(trans[map[i][j]][1]==0)
+                &#123;
+                    trans[map[i][j]][1]=(i+1)*m+j;
+                &#125;
+                else
+                &#123;
+                    trans[map[i][j]][2]=(i+1)*m+j;
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    head=1,tail=1;
+    que[1].x=begi;
+    que[1].y=begj;
+    que[1].sec=0;
+    mapv[begi][begj]=1;
+    while(head&lt;=tail)
+    &#123;
+        bfs(head);
+        head++;
+        if(pd==1)
+        &#123;
+            break;
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1126-机器人搬重物"><a href="#洛谷-P1126-机器人搬重物" class="headerlink" title="洛谷 P1126 机器人搬重物"></a>洛谷 P1126 机器人搬重物</h2><p>这个题目的设置，包括每一步可走的点，以及这些点所能遇到的情况都非常复杂，当时打了一遍出来a了一半的点，改了一次又a了一半的一半，最后才改对。</p>
+<h3 id="题目-5"><a href="#题目-5" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1126" title="https://www.luogu.org/problem/P1126">https://www.luogu.org/problem/P1126</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-6.1.jpg" alt="bfs-6.1.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-6.2.jpg" alt="bfs-6.2.jpg"></p>
+<h3 id="思路-5"><a href="#思路-5" class="headerlink" title="思路"></a>思路</h3><p>首先，题目中提及机器人的形状是直径1.6m的球，然后机器人在格点上行走。而在地图上给出的黑色位置，实际上会占据四个格点。这就需要我们在录入地图的时候做出一些巧妙的变化。</p>
+<p>此处搬一下题解里雒仁韬大佬所画的图（我不认识这位大佬，如果大佬觉得搬图侵权啥的我可以删掉）</p>
+<p><img src="https://www.z4a.net/images/2019/08/14/bfs-6.3.JPG.png" alt="bfs-6.3.JPG.png"></p>
+<p>其次，机器人可以朝面前方向行走一格两格或者三格，但是这都是在前方没有不能行走的格点的情况下，如果行走三格，就要看看前方两格三格的地方有没有障碍物。</p>
+<p>另外，贮藏室，也就是整张地图的外围一圈是有墙体的，这点在上面那位大佬的图中也有体现。</p>
+<p>最后，普通bfs对于每个格子打上标记，而我写这道题是对每个格子的每个方向都打上标记。我写的代码有四百行，因为其中包含着很多的判断分支，肯定是可以简化的，也会有简单一些的办法，或者说查看一下大佬们的解法都可以。</p>
+<h3 id="代码-5"><a href="#代码-5" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int mak[55][55][5]=&#123;0&#125;;	 
+int head,tail;
+int a,b,c,d;
+int jud=0;
+int n,m;
+struct que
+&#123;
+    int x;
+    int y;
+    int sec;
+    int fx;      //方向：0 上 1 右 2 下 3 左
+&#125;que[50005];
+void bfs(int ceng)
+&#123;
+    for(int i=1;i&lt;=5;i++)  //4:向右 5:向左 
+    &#123;
+        switch(i)
+        &#123;
+            case 1:
+                &#123;
+                    switch(que[ceng].fx)
+                    &#123;
+                        case 0:
+                            &#123;
+                                if(que[ceng].x-1&gt;=1)
+                                &#123;
+                                    if(mak[que[ceng].x-1][que[ceng].y][que[ceng].fx]==0)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x-1;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;
+                                &#125; 
+                            &#125;
+                        break;
+                        case 1:
+                            &#123;
+                                if(que[ceng].y+1&lt;=m+1)
+                                &#123;
+                                    if(mak[que[ceng].x][que[ceng].y+1][que[ceng].fx]==0)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y+1;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;
+                                &#125;
+                            &#125;
+                        break;
+                        case 2:
+                            &#123;
+                                if(que[ceng].x+1&lt;=n+1)
+                                &#123;
+                                    if(mak[que[ceng].x+1][que[ceng].y][que[ceng].fx]==0)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x+1;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;	
+                                &#125;
+                            &#125;
+                        break;
+                        case 3:
+                            &#123;
+                                if(que[ceng].y-1&gt;=1)
+                                &#123;
+                                    if(mak[que[ceng].x][que[ceng].y-1][que[ceng].fx]==0)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y-1;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;
+                                &#125;
+                            &#125;
+                        break;
+                    &#125;
+                &#125;
+            break;
+            case 2:
+                &#123;
+                    switch(que[ceng].fx)
+                    &#123;
+                        case 0:
+                            &#123;
+                                if(que[ceng].x-2&gt;=1)
+                                &#123;
+                                    if(mak[que[ceng].x-2][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x-1][que[ceng].y][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x-2;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;
+                                &#125; 
+                            &#125;
+                        break;
+                        case 1:
+                            &#123;
+                                if(que[ceng].y+2&lt;=m+1)
+                                &#123;
+                                    if(mak[que[ceng].x][que[ceng].y+2][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y+1][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y+2;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;	
+                                &#125;
+                            &#125;
+                        break;
+                        case 2:
+                            &#123;
+                                if(que[ceng].x+2&lt;=n+1)
+                                &#123;
+                                    if(mak[que[ceng].x+2][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x+1][que[ceng].y][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x+2;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;	
+                                &#125;
+                            &#125;
+                        break;
+                        case 3:
+                            &#123;
+                                if(que[ceng].y-2&gt;=1)
+                                &#123;
+                                    if(mak[que[ceng].x][que[ceng].y-2][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y-1][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y-2;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;		
+                                &#125;
+                            &#125;
+                        break;
+                    &#125;	
+                &#125;
+            break;
+            case 3:
+                &#123;
+                    switch(que[ceng].fx)
+                    &#123;
+                        case 0:
+                            &#123;
+                                if(que[ceng].x-3&gt;=1)
+                                &#123;
+                                    if(mak[que[ceng].x-3][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x-2][que[ceng].y][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x-1][que[ceng].y][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x-3;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;
+                                    
+                                &#125; 
+                            &#125;
+                        break;
+                        case 1:
+                            &#123;
+                                if(que[ceng].y+3&lt;=m+1)
+                                &#123;
+                                    if(mak[que[ceng].x][que[ceng].y+3][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y+2][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x][que[ceng].y+1][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y+3;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;		
+                                &#125;
+                            &#125;
+                        break;
+                        case 2:
+                            &#123;
+                                if(que[ceng].x+3&lt;=n+1)
+                                &#123;
+                                    if(mak[que[ceng].x+3][que[ceng].y][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x+2][que[ceng].y][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x+1][que[ceng].y][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x+3;
+                                        que[tail].y=que[ceng].y;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;	
+                                &#125;
+                            &#125;
+                        break;
+                        case 3:
+                            &#123;
+                                if(que[ceng].y-3&gt;=1)
+                                &#123;
+                                    if(mak[que[ceng].x][que[ceng].y-3][que[ceng].fx]==0&amp;&amp;mak[que[ceng].x][que[ceng].y-2][que[ceng].fx]!=1&amp;&amp;mak[que[ceng].x][que[ceng].y-1][que[ceng].fx]!=1)
+                                    &#123;
+                                        tail++;
+                                        que[tail].x=que[ceng].x;
+                                        que[tail].y=que[ceng].y-3;
+                                        que[tail].sec=que[ceng].sec+1;
+                                        que[tail].fx=que[ceng].fx;
+                                        if(que[tail].x==c&amp;&amp;que[tail].y==d)
+                                        &#123;
+                                            jud=1;
+                                            printf(&quot;%d\n&quot;,que[tail].sec);
+                                        &#125;
+                                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                                    &#125;		
+                                &#125;
+                            &#125;
+                        break;
+                    &#125;
+                &#125;
+            break;
+            case 4:
+                &#123;
+                    if(mak[que[ceng].x][que[ceng].y][(que[ceng].fx+1)%4]==0)
+                    &#123;
+                        tail++;
+                        que[tail].x=que[ceng].x;
+                        que[tail].y=que[ceng].y;
+                        que[tail].sec=que[ceng].sec+1;
+                        que[tail].fx=que[ceng].fx+1;
+                        que[tail].fx%=4;
+                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                    &#125;	
+                &#125;
+            break;
+            case 5:
+                &#123;
+                    if(mak[que[ceng].x][que[ceng].y][(que[ceng].fx+3)%4]==0)
+                    &#123;
+                        tail++;
+                        que[tail].x=que[ceng].x;
+                        que[tail].y=que[ceng].y;
+                        que[tail].sec=que[ceng].sec+1;
+                        que[tail].fx=que[ceng].fx+3;
+                        que[tail].fx%=4;
+                        mak[que[tail].x][que[tail].y][que[tail].fx]=2;
+                    &#125;		
+                &#125;
+            break;
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    int k;
+    char e;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=m;j++)
+        &#123;
+            scanf(&quot;%d&quot;,&amp;k);
+            if(k==1)
+            &#123;
+                for(int q=0;q&lt;=3;q++)
+                &#123;
+                    mak[i][j][q]=1;
+                    mak[i][j+1][q]=1;
+                    mak[i+1][j][q]=1;
+                    mak[i+1][j+1][q]=1;
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=n+1;i++)
+    &#123;
+        for(int q=0;q&lt;=3;q++)
+        &#123;
+            mak[i][1][q]=1;
+            mak[i][m+1][q]=1;
+        &#125;
+    &#125;
+    for(int j=1;j&lt;=m+1;j++)
+    &#123;
+        for(int q=0;q&lt;=3;q++)
+        &#123;
+            mak[1][j][q]=1;
+            mak[n+1][j][q]=1;
+        &#125;
+    &#125;
+    scanf(&quot;%d%d%d%d %c&quot;,&amp;a,&amp;b,&amp;c,&amp;d,&amp;e);
+    head=1;
+    tail=1;
+    a+=1;
+    b+=1;
+    c+=1;
+    d+=1;
+    if(a==c&amp;&amp;b==d)
+    &#123;
+        printf(&quot;0&quot;);
+        return 0;
+    &#125;
+    que[head].x=a;
+    que[head].y=b;
+    que[head].sec=0;
+    switch(e)
+    &#123;
+        case &#39;N&#39;:que[head].fx=0;
+        break;
+        case &#39;E&#39;:que[head].fx=1;
+        break;
+        case &#39;S&#39;:que[head].fx=2;
+        break;
+        case &#39;W&#39;:que[head].fx=3;
+        break;
+    &#125;
+    mak[a][b][que[head].fx]=1;
+    while(head&lt;=tail)
+    &#123;
+        bfs(head);
+        head++;
+        if(jud==1)	//下一步已经试探出终点 
+        &#123;
+            break;
+        &#125;
+    &#125;
+    if(jud==0)
+    &#123;
+        printf(&quot;-1&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1902-刺杀大使"><a href="#洛谷-P1902-刺杀大使" class="headerlink" title="洛谷 P1902 刺杀大使"></a>洛谷 P1902 刺杀大使</h2><h3 id="题目-6"><a href="#题目-6" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1902" title="https://www.luogu.org/problem/P1902">https://www.luogu.org/problem/P1902</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/22/bfs-6.4.jpg" alt="bfs-6.4.jpg"></p>
+<h3 id="思路-6"><a href="#思路-6" class="headerlink" title="思路"></a>思路</h3><p>二分答案+bfs能否到达</p>
+<p>未完待续……</p>
+<h3 id="代码-6"><a href="#代码-6" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+#define MAX 10005
+int v[1005][1005]=&#123;0&#125;;
+struct que
+&#123;
+    int x1;
+    int y1;
+&#125;que[1000005];
+int xa[5]=&#123;0,-1,0,1&#125;;
+int ya[5]=&#123;-1,0,1,0&#125;;
+int a[1005][1005];
+int head,tail;
+int r,l;
+int pd;
+int m,n;
+int mid;
+void bfs(int x,int y)
+&#123;
+    for(int i=0;i&lt;=3;i++)
+    &#123;
+        if(x+xa[i]&lt;=n&amp;&amp;x+xa[i]&gt;=1&amp;&amp;y+ya[i]&lt;=m&amp;&amp;y+ya[i]&gt;=1)
+        &#123;
+            if(v[x+xa[i]][y+ya[i]]==0)
+            &#123;
+                if(x+xa[i]==n)
+                &#123;
+                    pd=1;
+                &#125;
+                v[x+xa[i]][y+ya[i]]=1;
+                tail++;
+                que[tail].x1=x+xa[i];
+                que[tail].y1=y+ya[i];
+            &#125;
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        for(int j=1;j&lt;=m;j++)
+        &#123;
+            scanf(&quot;%d&quot;,&amp;a[i][j]);
+        &#125;
+    &#125;
+    r=1000;
+    l=0;
+    while(r&gt;=l)
+    &#123;
+        head=1,tail=1;
+        pd=0;
+        mid=(r+l)/2;
+        for(int i=1;i&lt;=n;i++)
+        &#123;
+            for(int j=1;j&lt;=m;j++)
+            &#123;
+                if(a[i][j]&gt;mid)
+                &#123;
+                    v[i][j]=1;
+                &#125;
+                else
+                &#123;
+                    v[i][j]=0;
+                &#125;
+            &#125;
+        &#125;
+        que[1].x1=1;
+        que[1].y1=1;
+        while(head&lt;=tail)
+        &#123;
+            bfs(que[head].x1,que[head].y1);
+            head++;
+            if(pd==1)
+            &#123;
+                break;
+            &#125;
+        &#125;
+        if(pd==1)
+        &#123;
+            r=mid-1;
+        &#125;
+        else
+        &#123;
+            l=mid+1;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,r+1);
+    return 0;
+&#125;
+</code></pre>
+<h1 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/bfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/">http://www.unknown9t.com/2022/04/29/bfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/%E5%B9%B6%E6%9F%A5%E9%9B%86/" title="并查集"><span>< PreviousPost</span><br><span class="prevTitle">并查集</span></a><a class="nextSlogan" href="/2022/04/29/Floyd/" title="Floyd（弗洛伊德）"><span>NextPost ></span><br><span class="nextTitle">Floyd（弗洛伊德）</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87%EF%BC%88%E4%BE%8B%E9%A2%98%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">正文（例题）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1746-%E7%A6%BB%E5%BC%80%E4%B8%AD%E5%B1%B1%E8%B7%AF"><span class="toc-number">2.1.</span> <span class="toc-text">洛谷 P1746 离开中山路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">2.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">2.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1443-%E9%A9%AC%E7%9A%84%E9%81%8D%E5%8E%86"><span class="toc-number">2.2.</span> <span class="toc-text">洛谷 P1443 马的遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1747-%E5%A5%BD%E5%A5%87%E6%80%AA%E7%9A%84%E6%B8%B8%E6%88%8F"><span class="toc-number">2.3.</span> <span class="toc-text">洛谷 P1747 好奇怪的游戏</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-2"><span class="toc-number">2.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1135-%E5%A5%87%E6%80%AA%E7%9A%84%E7%94%B5%E6%A2%AF"><span class="toc-number">2.4.</span> <span class="toc-text">洛谷 P1135 奇怪的电梯</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-3"><span class="toc-number">2.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-3"><span class="toc-number">2.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-3"><span class="toc-number">2.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1825-USACO11OPEN-%E7%8E%89%E7%B1%B3%E7%94%B0%E8%BF%B7%E5%AE%ABCorn-Maze"><span class="toc-number">2.5.</span> <span class="toc-text">洛谷 P1825 [USACO11OPEN]玉米田迷宫Corn Maze</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-4"><span class="toc-number">2.5.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-4"><span class="toc-number">2.5.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-4"><span class="toc-number">2.5.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1126-%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%90%AC%E9%87%8D%E7%89%A9"><span class="toc-number">2.6.</span> <span class="toc-text">洛谷 P1126 机器人搬重物</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-5"><span class="toc-number">2.6.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-5"><span class="toc-number">2.6.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-5"><span class="toc-number">2.6.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1902-%E5%88%BA%E6%9D%80%E5%A4%A7%E4%BD%BF"><span class="toc-number">2.7.</span> <span class="toc-text">洛谷 P1902 刺杀大使</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-6"><span class="toc-number">2.7.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-6"><span class="toc-number">2.7.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-6"><span class="toc-number">2.7.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD"><span class="toc-number">3.</span> <span class="toc-text">未完待续</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

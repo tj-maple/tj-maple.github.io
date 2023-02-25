@@ -1,0 +1,249 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>二分查找 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">二分查找</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="查找算法"> 查找算法</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这篇文章所要讲的二分查找，是一种效率很高的查找方法。二分查找可以将查找的时间复杂度降至*O(log2n)*，但是它要求所查找的数列至少是有序数列。在大部分题目中，这个数列会被规定为有序且连续，但在某些题目中，数列不是连续的，而如果无法查找到，则输出固定语句。这些大同小异，但是用二分查找的前提一定是该数列有序。 </p>
+<span id="more"></span>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="具体示例"><a href="#具体示例" class="headerlink" title="具体示例"></a>具体示例</h2><p>当我们在电话本中查找我们想要的人的电话号码时，我们通常知道想要查找的人的姓名，而电话本中记录的顺序完全按照姓名字母的字典序。我们通常如何查找？</p>
+<p>先翻到电话本的一半，判断一半时候的姓名字母是在目标姓名字母的前边还是后边，然后再在目标姓名字母存在的部分继续上述过程，最终可以查到目标电话号码，这就是二分查找的具体应用之一。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p><img src="https://www.z4a.net/images/2019/04/08/11227bde54ff43061.jpg" alt="二分查找1.jpg"></p>
+<p>如图所示，在当前数列中查找6是否存在，若存在，输出其其中一个序号。</p>
+<p>已知当前数列为非递减数列。首先，确定left为数列最左端，right为数列最右端。即left为1，right为11。设置mid变量，存储数列中点序号。在当前图所示状态下，mid取值为6，即6为该数列当前中点，只需比较所求数与中点所对应的数字。</p>
+<p>由于9&gt;6，可知所求数所对应序号只可能在6之前，也就是只可能存在于1到6之间。故用当前mid-1替换当前right。（之所以用mid-1是为了防止出现无限循环的情况）</p>
+<p><img src="https://www.z4a.net/images/2019/04/08/28856195014f52f18.jpg" alt="二分查找2.jpg"></p>
+<p>此时mid为（1+5）&#x2F;2即3。将所求数与序号3对应数字对比，5&lt;6，故所求数所对应序号只可能在3后，也就是只可能存在于3到6之间。故用当前mid+1替换当前left。（原因同上）</p>
+<p><img src="https://www.z4a.net/images/2019/04/08/38bc81c2b76e1909b.jpg" alt="二分查找3.jpg"></p>
+<p>此时mid为（4+5）&#x2F;2即4。将所求数与序号4对应数字对比，发现正好相等。代表该数列中6确实存在，故可以输出目标数字对应的序号。</p>
+<p>若left&gt;right，代表给出的数列已经查找完，没有发现目标数字。</p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ol>
+<li>应用二分查找法的前提一定是有序数列。</li>
+<li>二分查找法在应用时应密切注意各变量的限值重叠交叉问题，不然可能会出现死循环。</li>
+</ol>
+<h2 id="标准代码"><a href="#标准代码" class="headerlink" title="标准代码"></a>标准代码</h2><p>给出我手打的标准代码（默认给出的15个数有序）</p>
+<pre><code>#include&lt;stdio.h&gt;
+int main()
+&#123;
+    int l,r,i;
+    int goal;
+    int mid;
+    int pd=0;
+    int a[20];
+    scanf(&quot;%d&quot;,&amp;goal);
+    for(i=1;i&lt;=15;i++)
+    &#123;	
+        scanf(&quot;%d&quot;,&amp;a[i]);
+    &#125;
+    l=1;
+    r=15;
+    while(l&lt;=r)
+    &#123;
+        mid=(l+r)/2;
+        if(a[mid]==goal)
+        &#123;
+            printf(&quot;%d&quot;,mid);
+            pd=1;
+            break;
+        &#125;
+        else if(a[mid]&lt;goal)
+        &#123;
+            l=mid+1;
+        &#125;
+        else
+        &#123;
+            r=mid-1;
+        &#125;
+    &#125;
+    if(pd==0)
+    &#123;
+        printf(&quot;no answer&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>通常的，每一个二分查找的题目中应包含两个条件。一个是判断找到的标准，一个是判断无法找到的精度。在我上面的代码中，找到的标准就是目标数字等于了当前判断的数字，代表二分查找已经查找到了。判断精度则是无限接近于0，原因是我判断的标准是当l&gt;r时结束。在某些题目中，精度有明显给出，可以写成r-l&lt;精度的格式。有时，判断精度也可通过固定循环次数代替。</p>
+<h2 id="相关题目"><a href="#相关题目" class="headerlink" title="相关题目"></a>相关题目</h2><p>先提一句，在openjudge–noi上面有一个系列共十道二分法的题目。</p>
+<h3 id="查找最接近的元素–openjudge-noi"><a href="#查找最接近的元素–openjudge-noi" class="headerlink" title="查找最接近的元素–openjudge-noi"></a>查找最接近的元素–openjudge-noi</h3><p><a target="_blank" rel="noopener" href="http://noi.openjudge.cn/ch0111/01/" title="openjudge-noi1">http://noi.openjudge.cn/ch0111/01/</a></p>
+<p><img src="https://www.z4a.net/images/2019/04/12/4.2.jpg" alt="二分查找4.1.jpg"></p>
+<p>基本是道裸二分查找，没啥好说的……</p>
+<p>打出了ac代码，emmm我代码风格也不好，各人有各人的作法……</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int a[100005]=&#123;-1&#125;;
+int l,r;
+int n,m,t;
+int i;
+int mid,ans,ans1;
+int jdz(int cs)
+&#123;
+    if(cs&lt;0)
+    &#123;
+        return -cs;
+    &#125;
+    else
+    &#123;
+        return cs;
+    &#125;
+&#125; 
+int bj(int a1,int a2,int p)
+&#123;
+    if(a1==-1)
+    &#123;
+        a1=-999;
+    &#125;
+    if(a2==-1)
+    &#123;
+        a2=-999;
+    &#125;
+    if(jdz(a1-p)&lt;=jdz(a2-p))
+    &#123;
+        return a1;
+    &#125;
+    else
+    &#123;
+        return a2;
+    &#125;
+&#125;
+int cz(int q)
+&#123;	
+    l=1;
+    r=n;
+    while(l&lt;=r)
+    &#123;
+        mid=(l+r)/2;
+        if(a[mid]&lt;=q)
+        &#123;
+            l=mid+1;
+        &#125;
+        else
+        &#123;
+            r=mid-1;
+        &#125;
+    &#125;
+    mid=(l+r)/2;
+    ans1=bj(a[mid],a[mid+1],q);
+    a[0]=-1;
+    a[n+1]=-1;
+    return ans1;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d&quot;,&amp;n);
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;a[i]);
+    &#125;
+    scanf(&quot;%d&quot;,&amp;m);
+    for(i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;t);
+        ans=cz(t);
+        printf(&quot;%d\n&quot;,ans);
+    &#125;
+    return 0;
+&#125; 
+</code></pre>
+<h3 id="二分法求函数的零点–openjudge-noi"><a href="#二分法求函数的零点–openjudge-noi" class="headerlink" title="二分法求函数的零点–openjudge-noi"></a>二分法求函数的零点–openjudge-noi</h3><p><a target="_blank" rel="noopener" href="http://noi.openjudge.cn/ch0111/02/" title="openjudge-noi2">http://noi.openjudge.cn/ch0111/02/</a></p>
+<p><img src="https://www.z4a.net/images/2019/04/12/4.3.jpg" alt="二分查找4.3.jpg"></p>
+<p>也是道裸二分查找，跟上面那题难度相差不多，也就是个精度问题。</p>
+<h3 id="x的平方根–leetcode（力扣网）"><a href="#x的平方根–leetcode（力扣网）" class="headerlink" title="x的平方根–leetcode（力扣网）"></a>x的平方根–leetcode（力扣网）</h3><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sqrtx/" title="力扣网">https://leetcode-cn.com/problems/sqrtx/</a></p>
+<p><img src="https://www.z4a.net/images/2019/04/11/3.1.jpg" alt="二分查找4.2.jpg"></p>
+<p>这道题是一道二分答案的题目，可以看出精度部分可以取0.01，通过不断假设答案是当前值，然后不断二分得到最接近的结果，通过检验得出答案，不是很难……</p>
+<h2 id="高级应用"><a href="#高级应用" class="headerlink" title="高级应用"></a>高级应用</h2><p>未完待续……</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">http://www.unknown9t.com/2022/04/29/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7%E7%B2%BE%E9%80%89/" title="常用技巧精选"><span>< PreviousPost</span><br><span class="prevTitle">常用技巧精选</span></a><a class="nextSlogan" href="/2022/04/29/%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8OJ%E5%B9%B3%E5%8F%B0/" title="个人常用OJ平台"><span>NextPost ></span><br><span class="nextTitle">个人常用OJ平台</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%A4%BA%E4%BE%8B"><span class="toc-number">2.1.</span> <span class="toc-text">具体示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">2.2.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">2.3.</span> <span class="toc-text">注意事项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E5%87%86%E4%BB%A3%E7%A0%81"><span class="toc-number">2.4.</span> <span class="toc-text">标准代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E9%A2%98%E7%9B%AE"><span class="toc-number">2.5.</span> <span class="toc-text">相关题目</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E6%9C%80%E6%8E%A5%E8%BF%91%E7%9A%84%E5%85%83%E7%B4%A0%E2%80%93openjudge-noi"><span class="toc-number">2.5.1.</span> <span class="toc-text">查找最接近的元素–openjudge-noi</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E5%88%86%E6%B3%95%E6%B1%82%E5%87%BD%E6%95%B0%E7%9A%84%E9%9B%B6%E7%82%B9%E2%80%93openjudge-noi"><span class="toc-number">2.5.2.</span> <span class="toc-text">二分法求函数的零点–openjudge-noi</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#x%E7%9A%84%E5%B9%B3%E6%96%B9%E6%A0%B9%E2%80%93leetcode%EF%BC%88%E5%8A%9B%E6%89%A3%E7%BD%91%EF%BC%89"><span class="toc-number">2.5.3.</span> <span class="toc-text">x的平方根–leetcode（力扣网）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E7%BA%A7%E5%BA%94%E7%94%A8"><span class="toc-number">2.6.</span> <span class="toc-text">高级应用</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

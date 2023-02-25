@@ -1,0 +1,748 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>并查集 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">并查集</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="数据结构"> 数据结构</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>正如百度百科所说，并查集是一种树形的数据结构，并且用于处理一些不相交集合的合并及查询问题。一般地来说，并查集由两个部分组成，一个是查找要操作的两个集合是否属于同一个，另一个则是进行这两个集合合并的过程。</p>
+<span id="more"></span>
+
+<p>并查集中，每一个集合用一个标识来表示，一般来说，大家都会选择这棵树的根作为这个标识。我们根据每棵树的标记来判断某些节点是否在同一个集合中，也就是是否属于同一棵树。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>就我目前的理解来说，并查集本身其实只包含三个部分：初始化，查找与合并。而其中查找与合并两个部分，有可能边并边查，也同样有可能先并再查，这都无可厚非，并且不影响并查集本身的工作。在查找和合并这两个步骤又分别包含了两种优化方式，也就是我们常说的路径压缩和按秩合并。</p>
+<h2 id="并查集本身"><a href="#并查集本身" class="headerlink" title="并查集本身"></a>并查集本身</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>并查集是一种树形的数据结构。我们要运用并查集求解问题，就需要构建树。我们首先把每个节点的标记初始化为它自身，也就是说每个节点自成一棵树，这个节点既是自己的父亲（f数组记录），也是自己的祖宗（find函数查找）。</p>
+<p>用代码实现就是如下效果</p>
+<pre><code>   for(int i=1;i&lt;=n;i++) 	//n为节点数
+&#123;
+    f[i]=i;				//f数组记录节点的父节点
+&#125;
+</code></pre>
+<h3 id="查找"><a href="#查找" class="headerlink" title="查找"></a>查找</h3><p>我们可能需要对某两个节点进行判断，判断他们之间是否存在某种关系（比如是否是敌人或者是否是朋友）。此时我们只需找到两个节点的祖先（find函数返回的值）并且判断两个节点的祖先是否相等。</p>
+<p>这里就出现了一个问题，我们每次寻找祖先的时候都需要不断上访节点的父亲，假如某个辈分极低的节点被反复查询，该极长的路径被反复遍历。抑或是该辈分极低的节点被查询过，而在它上面的节点又被查询，就会导致某一条路被反复遍历，无疑浪费了时间。这里就引出了第一种优化方式：路径压缩。当然我们在此只是提一句，下面并查集优化的时候再详细讲解。</p>
+<p>这里的查找函数写法有两种，一种是递归写法，一种是非递归写法，我都写在下面，仅供参考。</p>
+<p>这里是递归写法：</p>
+<pre><code>int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return find(f[r]);
+    &#125;
+&#125;
+</code></pre>
+<p>这里是非递归写法：</p>
+<pre><code>int find(int r)
+&#123;
+    while(f[r]==r)
+    &#123;
+        r=f[r];
+    &#125;
+    return r;
+&#125;
+</code></pre>
+<h3 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h3><p>并查集的过程中，既需要查找，也需要合并。当两个节点当前所处集合不同，但实际上应该处于同一集合时，我们需要将这两个集合合并。当然，我们并不能只是合并这两个点，而是应该查找它们的祖先节点，并且合并两个祖先节点，选择一个祖先节点为两个集合共同的祖先节点（也即代表节点）。</p>
+<p>我们只需要把其中一个祖先节点的父亲节点赋值成另外一个祖先节点即可完成该操作。</p>
+<pre><code>if(find(a)!=find(b))
+&#123;
+    f[find(a)]=find(b);
+&#125;
+</code></pre>
+<p>这里可以提前把a节点和b节点的祖先赋给两个变量来缩减代码量。</p>
+<p>在这里，又可以引出另一个优化的可能，那就是在合并的时候，可能会出现一大一小两棵树（也可以称作一大一小两个集合），若把大树并到了小树上，就会导致最长的路径越来越长以致于查询的时候需要遍历的节点不断增多。由此引出了按秩合并的思路，我们总寻找小树，并且把小树并到大树上。这里也暂作引出，下面来解释优化操作。</p>
+<h2 id="并查集优化"><a href="#并查集优化" class="headerlink" title="并查集优化"></a>并查集优化</h2><p>我们很明显可以看出来，并查集本身的时间消耗还是比较大的，并且存在着大量的重复遍历操作，下面我来解释两种常见的优化方式。单独用按秩合并可以将并查集的时间复杂度降低到O(nlogn)，既n乘以2为底n的对数，单独使用路径压缩则会提升查找效率。而两种一起用甚至可以将每一步查找、合并的时间复杂度降低至O(α(n))，其中α(n)名为反阿克曼函数。阿克曼函数极剧增长而反阿克曼函数几乎不增长，我们可以将优化后的并查集时间复杂度看作O(n)，n为操作数。</p>
+<p>至于为什么会被优化这么多，以至于达到了O(n)的线性增长关系，相信我解释完这两种优化方式之后你心中会有一点答案。</p>
+<h3 id="路径压缩"><a href="#路径压缩" class="headerlink" title="路径压缩"></a>路径压缩</h3><p>首先，路径压缩，正如我上面查找步骤讲解中所说，在某一条极长路径中，一些路径会被反复遍历，从而造成重复冗余。所以，我们在查找的时候，对于每一个节点，改变它们的路径，让他们直接连接在根节点（标识节点）也即祖先节点下，使他们与祖先节点成为父子关系。这样，在再次查询这些点的时候，仅需最多两次查找即可查询到它们的祖先节点。</p>
+<pre><code>int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f[r]=find(f[r]);
+    &#125;
+&#125;
+</code></pre>
+<p>这是一种递归形式，在递归的过程中就把祖先节点赋值成了这些过程中包含的节点的父亲。</p>
+<h3 id="按秩合并"><a href="#按秩合并" class="headerlink" title="按秩合并"></a>按秩合并</h3><p>然后，按秩合并，也正如我上面合并步骤讲解中所说，大树合并到小树上的时候会造成不小的麻烦，所以我们在合并之前判断一下两个集合的大小关系，并且把小树合并到大树上。我们将这个大小关系规定成口中的“秩”。这个“秩”既可以代表树的高度，也可以代表集合内节点的数量。但是在这里要注意了！！！只有在没有使用路径压缩的时候才可以用“秩”代表树的高度，因为一旦路径压缩，所有的子节点全部与祖先节点直连，树的高度都将被划成2。故一般在同时使用两种优化方式时，通常直接把秩看作了节点数量。</p>
+<pre><code>int azhb(int l,int r)
+&#123;
+    if(jds[find(l)]&lt;jds[find(r)])
+    &#123;
+        f[find(l)]=find(r);
+        jds[find(r)]+=jds[find(l)];
+    &#125;
+    else
+    &#123;
+        f[find(r)]=find(l);
+        jds[find(l)]+=jds[find(r)];
+    &#125;
+&#125;
+</code></pre>
+<p>在这里，我规定传进来的参数为两个原始节点，然而这样会比较麻烦，所以我一般在用到按秩合并的时候都会直接将两个祖先节点传进来，以便于直接使用jds（节点数）这个数组。ps：函数名就是按秩合并的缩写，不要吐槽这个……</p>
+<h3 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h3><p>我们降低问题的复杂程度，假设只需要进行n次操作，所有的查找都在合并操作之后出现。对于每个需要访问的节点x，在其第一次被查找的时候就会被路径压缩优化成与祖先节点直连，当再次访问x节点的时候，只需要最多两次最少一次的访问。而按秩合并则会一直保证不会出现高度大于2的树出现。两种优化方式一起出现，会直接将并查集的时间复杂度降低到线性增长关系。</p>
+<p>其中反阿克曼函数有关的知识，有兴趣的话可以自行查找理解学习，我暂时没太大兴趣，也许之后会深入学习一下。</p>
+<h2 id="引例讲解全过程"><a href="#引例讲解全过程" class="headerlink" title="引例讲解全过程"></a>引例讲解全过程</h2><p><img src="https://www.z4a.net/images/2019/09/06/1.1.jpg" alt="1.1.jpg"></p>
+<p>来看这个例子，实际上这个输入输出样例是洛谷P3367 并查集的一道模板题，我把它拿下来当作例子来讲解一下。</p>
+<p>首先看输入，4个点，7个操作。每个操作的第一个数字，1代表着合并操作，2代表着查询操作。</p>
+<p>一开始对这四个点进行初始化：</p>
+<p><img src="https://www.z4a.net/images/2019/09/06/1.2.jpg" alt="1.2.jpg"></p>
+<p>这四个点，每一个都是独立的一个集合。</p>
+<p>然后我们开始进行操作，第一条操作查找，我们就直接用find函数寻找祖先，发现都是它们本身，判断出来不在同一集合，肯定输出N。</p>
+<p>第二条操作和第四条操作分别合并1 2以及3 4，合并之后的效果就是这样。</p>
+<p><img src="https://www.z4a.net/images/2019/09/06/1.3.jpg" alt="1.3.jpg"></p>
+<p>而在此时，操作要求把2和3合并，我们查询2的祖先发现是1，查询3的祖先，发现就是3本身，故合并1与3。</p>
+<p><img src="https://www.z4a.net/images/2019/09/07/1.4.jpg" alt="1.4.jpg"></p>
+<p>如果加入了路径压缩，在下一次操作也就是最后一次操作的时候，需要查询1和4，此时会在查询的过程中，将4直连到1的下面。</p>
+<p><img src="https://www.z4a.net/images/2019/09/07/1.5.jpg" alt="1.5.jpg"></p>
+<p>而由于这个例子不算复杂，体现不出来按秩合并以及路径压缩的真意。我来稍微让这个例子变得复杂一些，再分析一下。</p>
+<p><img src="https://www.z4a.net/images/2019/09/07/1.6.jpg" alt="1.6.jpg"></p>
+<p>我们在4节点的下面再连接一个5节点</p>
+<p>如果我们不考虑按秩合并，只进行路径压缩，把3节点并到1上面。</p>
+<p><img src="https://www.z4a.net/images/2019/09/07/1.7.jpg" alt="1.7.jpg"></p>
+<p>这样我们在下次查询5的时候，进行路径压缩，需要转移4和5两次。这样看来，把1并给3的时候也会转移两次，好像没什么太大的时间优势。但是当长链够长的时候，按秩合并的时间优势就会体现出来，并且把时间复杂度大幅优化。</p>
+<p>在我出的这个例子中，貌似把“秩”当作树的高度也可以，但是试想一下经过路径压缩之后，每个集合都变成了一个根节点下面连着数个节点的多叉树，所以路径压缩之后的并查集，“秩”还是当作节点数好一些。</p>
+<p>下面我来贴出我模板的代码</p>
+<pre><code>#include&lt;stdio.h&gt;
+int f[10005];
+int jds[10005]=&#123;0&#125;;
+int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f[r]=find(f[r]);
+    &#125;
+&#125;
+int azhb(int l,int r)
+&#123;
+    if(jds[l]&lt;jds[r])
+    &#123;
+        f[l]=r;
+        jds[r]+=jds[l];
+    &#125;
+    else
+    &#123;
+        f[r]=l;
+        jds[l]+=jds[r];
+    &#125;
+&#125;
+int main()
+&#123;
+    int n,m;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    int a,b,c;
+    int fb,fc;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        f[i]=i;
+    &#125;
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+        fb=find(b);
+        fc=find(c);
+        if(a==1)
+        &#123;
+            if(fb!=fc)
+            &#123;
+                azhb(fb,fc);
+            &#125;
+        &#125;
+        else
+        &#123;
+            if(fb==fc)
+            &#123;
+                printf(&quot;Y\n&quot;);
+            &#125;
+                else
+            &#123;
+                printf(&quot;N\n&quot;);
+            &#125;
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>别吐槽我的变量名和函数名＞﹏＜</p>
+<h2 id="多关系并查集"><a href="#多关系并查集" class="headerlink" title="多关系并查集"></a>多关系并查集</h2><h1 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h1><h2 id="洛谷-P1551-亲戚"><a href="#洛谷-P1551-亲戚" class="headerlink" title="洛谷 P1551 亲戚"></a>洛谷 P1551 亲戚</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1551" title="https://www.luogu.org/problem/P1551">https://www.luogu.org/problem/P1551</a></p>
+<p><img src="https://www.z4a.net/images/2019/09/07/2.1.jpg" alt="2.1.jpg"></p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>就是一个裸的并查集。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int f[10005];
+int jds[10005];
+int a,b;
+int fa,fb;
+int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f[r]=find(f[r]);
+    &#125;
+&#125;
+int azhb(int l,int r)
+&#123;
+    if(jds[l]&lt;jds[r])
+    &#123;
+        f[fa]=fb;
+        jds[r]+=jds[l];
+    &#125;
+    else
+    &#123;
+        f[fb]=fa;
+        jds[l]+=jds[r];
+    &#125;
+&#125;
+int main()
+&#123;
+    int n,m,p;
+    scanf(&quot;%d%d%d&quot;,&amp;n,&amp;m,&amp;p);
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        f[i]=i;
+    &#125;
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        fa=find(a);
+        fb=find(b);
+        if(fa!=fb)
+        &#123;
+            azhb(fa,fb);
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=p;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        if(find(a)==find(b))
+        &#123;
+            printf(&quot;Yes\n&quot;);
+        &#125;
+        else
+        &#123;
+            printf(&quot;No\n&quot;);
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P2820-局域网"><a href="#洛谷-P2820-局域网" class="headerlink" title="洛谷 P2820 局域网"></a>洛谷 P2820 局域网</h2><h3 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P2820" title="https://www.luogu.org/problem/P2820">https://www.luogu.org/problem/P2820</a></p>
+<p><img src="https://www.z4a.net/images/2019/09/07/3.1.jpg" alt="3.1.jpg"></p>
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>这是一个最小生成树的题目，几乎可以算是裸的最小生成树，有关最小生成树的算法在之后我会开专题讲解。这里我来简单阐述一下这道题我用到的，我这道题用到了克鲁斯卡尔，大概思路就是，先把图中所有路径从小到大排序，然后逐个进行判断，若两个点不在同一集合则合并，若在同一集合则往下过，直到图中所有点都已经进入点集。</p>
+<p>简单来说，就是一种排序算法先对数据进行处理，然后再用并查集最后求得最小值。</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int v[10005]=&#123;0&#125;;
+int f[10005];
+int jds[10005];
+struct a
+&#123;
+    int begin;
+    int end;
+    int w;
+&#125;a[10005];
+int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f[r]=find(f[r]);
+    &#125;
+&#125;
+int azhb(int l,int r)
+&#123;
+    if(jds[l]&lt;jds[r])
+    &#123;
+        f[l]=r;
+        jds[r]+=jds[l];
+    &#125; 
+    else
+    &#123;
+        f[r]=l;
+        jds[l]+=jds[r];
+    &#125;
+&#125;
+int main()
+&#123;
+    int n,k;
+    int t;
+    int fa,fb;
+    int sum=0;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+    for(int i=1;i&lt;=k;i++)
+    &#123;
+        scanf(&quot;%d%d%d&quot;,&amp;a[i].begin,&amp;a[i].end,&amp;a[i].w);	
+    &#125;
+    for(int i=1;i&lt;=k;i++)
+    &#123;
+        f[i]=i;
+        jds[i]=1;	
+    &#125;
+    for(int i=k;i&gt;=1;i--)
+    &#123;
+        for(int j=1;j&lt;=i-1;j++)
+        &#123;
+            if(a[j].w&gt;a[j+1].w)
+            &#123;
+                t=a[j].w;
+                a[j].w=a[j+1].w;
+                a[j+1].w=t;
+                t=a[j].begin;
+                a[j].begin=a[j+1].begin;
+                a[j+1].begin=t;
+                t=a[j].end;
+                a[j].end=a[j+1].end;
+                a[j+1].end=t;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=k;i++)
+    &#123;
+        fa=find(a[i].begin);
+        fb=find(a[i].end);
+        if(fa!=fb)
+        &#123;
+            azhb(fa,fb);
+            v[i]=1;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=k;i++)
+    &#123;
+        if(v[i]==0)
+        &#123;
+            sum+=a[i].w;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P3144-USACO16OPEN-关闭农场Closing-the-Farm-Silver"><a href="#洛谷-P3144-USACO16OPEN-关闭农场Closing-the-Farm-Silver" class="headerlink" title="洛谷 P3144 [USACO16OPEN]关闭农场Closing the Farm_Silver"></a>洛谷 P3144 [USACO16OPEN]关闭农场Closing the Farm_Silver</h2><h3 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P3144" title="https://www.luogu.org/problem/P3144">https://www.luogu.org/problem/P3144</a></p>
+<p><img src="https://www.z4a.net/images/2019/09/07/4.1.jpg" alt="4.1.jpg"></p>
+<h3 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h3><p>这个题可以倒着想，逐渐加边进去。因为并查集只能合并以及查询，也就是不断加边进图，而不能从图中删除边，所以很自然的想到倒着加边进去然后判断一共有几个集合，时间复杂度也不会很高。</p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int dian[3005]=&#123;0&#125;;
+int sc[3005];
+int f[3005];
+int v[3005][3005]=&#123;0&#125;;
+int jl[3005];
+int jds[3005];
+int jhs;
+int a,b;
+int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f[r]=find(f[r]);
+    &#125;
+&#125;
+int azhb(int l,int r)
+&#123;
+    if(jds[l]&lt;jds[r])
+    &#123;
+        f[l]=r;
+        jds[r]+=jds[l];
+    &#125;
+    else
+    &#123;
+        f[r]=l;
+        jds[l]+=jds[r];
+    &#125;
+&#125;
+int main()
+&#123;
+    int n,m;
+    jhs=0;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        v[a][b]=1;
+        v[b][a]=1;
+    &#125;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        f[i]=i;
+    &#125;
+    for(int i=n;i&gt;=1;i--)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;jl[i]);
+    &#125;
+    sc[1]=1;
+    dian[jl[1]]=1;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        if(v[jl[1]][i]==1)
+        &#123;
+            if(dian[i]==1)
+            &#123;
+                azhb(find(jl[1]),find(i));
+            &#125;
+        &#125;
+    &#125;
+    for(int i=2;i&lt;=n;i++)
+    &#123;
+        jhs=0;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            if(v[jl[i]][j]==1)
+            &#123;
+                if(dian[j]==1)
+                &#123;
+                    azhb(find(jl[i]),find(j));
+                &#125;
+            &#125;
+        &#125;
+        dian[jl[i]]=1;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            if(dian[j]==1&amp;&amp;f[j]==j)
+            &#123;
+                jhs++;
+            &#125;
+        &#125;
+        if(jhs&gt;1)
+        &#123;
+            sc[i]=0;
+        &#125;
+        else
+        &#123;
+            sc[i]=1;
+        &#125;
+    &#125;
+    for(int i=n;i&gt;=1;i--)
+    &#123;
+        if(sc[i]==1)
+        &#123;
+            printf(&quot;YES\n&quot;);
+        &#125;
+        else
+        &#123;
+            printf(&quot;NO\n&quot;);
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P3958-奶酪"><a href="#洛谷-P3958-奶酪" class="headerlink" title="洛谷 P3958 奶酪"></a>洛谷 P3958 奶酪</h2><h3 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P3958" title="https://www.luogu.org/problem/P3958">https://www.luogu.org/problem/P3958</a></p>
+<p><img src="https://www.z4a.net/images/2019/09/07/6.1.jpg" alt="6.1.jpg"></p>
+<h3 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h3><p>这道题我把奶酪的上表面空气与下表面空气看作了两个横跨长宽的大集合，然后当有可以通向下面的奶酪洞存在时，我便将下表面空气的大集合和该奶酪洞合并，上表面空气也是一样的操作，最后查询上表面空气和下表面空气是否存在于一个集合中即可完成。</p>
+<h3 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int f[10005];
+int jds[10005];
+int n,h,r;
+struct a
+&#123;
+    long long x;
+    long long y;
+    long long z;
+&#125;a[1005];
+int find(int r)
+&#123;
+    if(f[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f[r]=find(f[r]);
+    &#125;
+&#125;
+long long pf(long long q)
+&#123;
+    return q*q;
+&#125;
+void azhb(int l,int r)
+&#123;
+    if(jds[l]&lt;jds[r])
+    &#123;
+        f[l]=r;
+        jds[r]+=jds[l];
+    &#125;
+    else
+    &#123;
+        f[r]=l;
+        jds[l]+=jds[r];
+    &#125;
+&#125;
+int main()
+&#123;
+    int t;
+    scanf(&quot;%d&quot;,&amp;t);
+    for(int i=1;i&lt;=t;i++)
+    &#123;
+        scanf(&quot;%d%d%d&quot;,&amp;n,&amp;h,&amp;r);
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            f[j]=j;
+            jds[j]=0;
+        &#125;
+        f[2000]=2000;
+        jds[2000]=0;
+        f[3000]=3000;
+        jds[3000]=0;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            scanf(&quot;%lld%lld%lld&quot;,&amp;a[j].x,&amp;a[j].y,&amp;a[j].z);
+        &#125;
+        for(int j=1;j&lt;=n;j++)
+        &#123;
+            for(int k=1;k&lt;=n;k++)
+            &#123;
+                if(sqrt(pf(a[j].x-a[k].x)+pf(a[j].y-a[k].y)+pf(a[j].z-a[k].z))&lt;=(r*2))
+                &#123;
+                    azhb(find(j),find(k));
+                &#125;
+            &#125;
+            if((a[j].z)&lt;=r)
+            &#123;
+                azhb(find(j),find(2000));
+            &#125;
+            if((a[j].z)&gt;=h-r)
+            &#123;
+                azhb(find(j),find(3000));
+            &#125;
+        &#125;
+        if(find(2000)==find(3000))
+        &#123;
+            printf(&quot;Yes\n&quot;);
+        &#125;
+        else
+        &#123;
+            printf(&quot;No\n&quot;);
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P2078-朋友"><a href="#洛谷-P2078-朋友" class="headerlink" title="洛谷 P2078 朋友"></a>洛谷 P2078 朋友</h2><h3 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P2078" title="https://www.luogu.org/problem/P2078">https://www.luogu.org/problem/P2078</a></p>
+<p><img src="https://www.z4a.net/images/2019/09/07/7.1.jpg" alt="7.1.jpg"></p>
+<h3 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h3><p>这道题就是两个并查集。</p>
+<h3 id="代码-4"><a href="#代码-4" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int f1[10005];
+int f2[10005];
+int jds1[10005];
+int jds2[10005]; 
+int jdz(int r)
+&#123;
+    if(r&lt;0)
+    &#123;
+        return -r;
+    &#125;
+    else
+    &#123;
+        return r;
+    &#125;
+&#125;
+int min(int l,int r)
+&#123;
+    if(l&lt;r)
+    &#123;
+        return l;
+    &#125;
+    else
+    &#123;
+        return r;
+    &#125;
+&#125;
+int find1(int r)
+&#123;
+    if(f1[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f1[r]=find1(f1[r]);
+    &#125;
+&#125;
+int azhb1(int l,int r)
+&#123;
+    if(jds1[l]&lt;jds1[r])
+    &#123;
+        f1[l]=r;
+        jds1[r]+=jds1[l];
+    &#125;
+    else
+    &#123;
+        f1[r]=l;
+        jds1[l]+=jds1[r];
+    &#125;
+&#125;
+int find2(int r)
+&#123;
+    if(f2[r]==r)
+    &#123;
+        return r;
+    &#125;
+    else
+    &#123;
+        return f2[r]=find2(f2[r]);
+    &#125;
+&#125;
+int azhb2(int l,int r)
+&#123;	
+    if(jds2[l]&lt;jds2[r])
+    &#123;
+        f2[l]=r;
+        jds2[r]+=jds2[l];
+    &#125;
+    else
+    &#123;
+        f2[r]=l;
+        jds2[l]+=jds2[r];
+    &#125;
+&#125;
+int main()
+&#123;
+    int n,m,p,q;
+    int fa,fb;
+    int a,b;
+    scanf(&quot;%d%d%d%d&quot;,&amp;n,&amp;m,&amp;p,&amp;q);
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        f1[i]=i;
+        jds1[i]=1;
+    &#125;
+    for(int i=1;i&lt;=m;i++)
+    &#123;
+        f2[i]=i;
+        jds2[i]=1;
+    &#125;
+    for(int i=1;i&lt;=p;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        fa=find1(a);
+        fb=find1(b);
+        if(fa!=fb)
+        &#123;
+            azhb1(fa,fb);
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=q;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        fa=find2(jdz(a));
+        fb=find2(jdz(b));
+        if(fa!=fb)
+        &#123;
+            azhb2(fa,fb);
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,min(jds1[find1(1)],jds2[find2(1)]));
+    return 0;
+&#125;
+</code></pre>
+<h1 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/%E5%B9%B6%E6%9F%A5%E9%9B%86/">http://www.unknown9t.com/2022/04/29/%E5%B9%B6%E6%9F%A5%E9%9B%86/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/%E9%80%92%E6%8E%A8%E7%AE%97%E6%B3%95/" title="递推算法"><span>< PreviousPost</span><br><span class="prevTitle">递推算法</span></a><a class="nextSlogan" href="/2022/04/29/bfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/" title="bfs习题讲解"><span>NextPost ></span><br><span class="nextTitle">bfs习题讲解</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E6%9F%A5%E9%9B%86%E6%9C%AC%E8%BA%AB"><span class="toc-number">2.1.</span> <span class="toc-text">并查集本身</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.1.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE"><span class="toc-number">2.1.2.</span> <span class="toc-text">查找</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%88%E5%B9%B6"><span class="toc-number">2.1.3.</span> <span class="toc-text">合并</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BC%98%E5%8C%96"><span class="toc-number">2.2.</span> <span class="toc-text">并查集优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E5%BE%84%E5%8E%8B%E7%BC%A9"><span class="toc-number">2.2.1.</span> <span class="toc-text">路径压缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%89%E7%A7%A9%E5%90%88%E5%B9%B6"><span class="toc-number">2.2.2.</span> <span class="toc-text">按秩合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="toc-number">2.2.3.</span> <span class="toc-text">时间复杂度分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E4%BE%8B%E8%AE%B2%E8%A7%A3%E5%85%A8%E8%BF%87%E7%A8%8B"><span class="toc-number">2.3.</span> <span class="toc-text">引例讲解全过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E5%85%B3%E7%B3%BB%E5%B9%B6%E6%9F%A5%E9%9B%86"><span class="toc-number">2.4.</span> <span class="toc-text">多关系并查集</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BE%8B%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">例题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1551-%E4%BA%B2%E6%88%9A"><span class="toc-number">3.1.</span> <span class="toc-text">洛谷 P1551 亲戚</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">3.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">3.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">3.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P2820-%E5%B1%80%E5%9F%9F%E7%BD%91"><span class="toc-number">3.2.</span> <span class="toc-text">洛谷 P2820 局域网</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">3.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P3144-USACO16OPEN-%E5%85%B3%E9%97%AD%E5%86%9C%E5%9C%BAClosing-the-Farm-Silver"><span class="toc-number">3.3.</span> <span class="toc-text">洛谷 P3144 [USACO16OPEN]关闭农场Closing the Farm_Silver</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-2"><span class="toc-number">3.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-2"><span class="toc-number">3.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-2"><span class="toc-number">3.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P3958-%E5%A5%B6%E9%85%AA"><span class="toc-number">3.4.</span> <span class="toc-text">洛谷 P3958 奶酪</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-3"><span class="toc-number">3.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-3"><span class="toc-number">3.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-3"><span class="toc-number">3.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P2078-%E6%9C%8B%E5%8F%8B"><span class="toc-number">3.5.</span> <span class="toc-text">洛谷 P2078 朋友</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-4"><span class="toc-number">3.5.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-4"><span class="toc-number">3.5.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-4"><span class="toc-number">3.5.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD%E2%80%A6"><span class="toc-number">4.</span> <span class="toc-text">未完待续…</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

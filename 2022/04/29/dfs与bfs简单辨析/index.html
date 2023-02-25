@@ -1,0 +1,136 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>dfs与bfs简单辨析 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">dfs与bfs简单辨析</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="dfs"> dfs</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="bfs"> bfs</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>dfs即深度优先搜索(deep first search)与bfs即宽度优先搜索(breadth first search)究竟有哪些不同，本文将会依据我自己的理解，做出一定深度的阐述。</p>
+<span id="more"></span>
+
+<p>首先，需要大家清楚，dfs通常与栈这种数据结构相联系，bfs则与队列联系紧密，这两种数据结构的特性决定了其与算法内在必然的关系。两种搜索算法都应用了递归的思想，所以有相关知识的浏览者能够很快理解。</p>
+<p>接下来我将结合具体图形进行分析。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="dfs"><a href="#dfs" class="headerlink" title="dfs"></a>dfs</h2><p><img src="https://www.z4a.net/images/2019/03/27/35e7b7a6ce3a912a4937eb5ae891b063.jpg" alt="二叉树.jpg"></p>
+<p>我们以该二叉树为例结合堆栈示意图，先讲解dfs递归的过程。</p>
+<p>首先我们将整棵树的根节点即1节点入栈。</p>
+<p><img src="https://www.z4a.net/images/2019/03/27/1.2.jpg" alt="1.jpg"></p>
+<p>然后查找1节点下是否有子节点，发现了2节点，我们把2节点入栈。</p>
+<p><img src="https://www.z4a.net/images/2019/03/27/25cd058d4e5c5dd6d.jpg" alt="2.jpg"></p>
+<p>如此查找到4节点下有子节点7，7节点下没有子节点，此时栈中已经有了四个节点。</p>
+<p><img src="https://www.z4a.net/images/2019/03/27/3fb1e4f4fb44cf919.jpg" alt="3.jpg"></p>
+<p>7节点下没有子节点，代表该路径已经到底，所以向上一层回溯，7节点出栈，查询4节点有没有除7节点外的子节点，发现8节点，8节点入栈。</p>
+<p><a target="_blank" rel="noopener" href="https://www.z4a.net/image/7pdHYn"><img src="https://www.z4a.net/images/2019/03/27/4d3641ffa9766b890.jpg" alt="4.jpg"></a></p>
+<p>这时对8节点查询，发现8节点并没有子节点，向上回溯，到4节点，发现4节点也没有其余子节点，继续回溯，找到2节点，查询2节点。通过查询2节点，发现了2节点下的5节点，以及5节点下的9节点。</p>
+<p><img src="https://www.z4a.net/images/2019/03/27/589a1c72a1f611c14.jpg" alt="5.jpg"></p>
+<p>对9节点查询，无子节点，回溯到5节点，回溯到2节点，发现2节点无其余子节点，回溯到1节点，查询后发现3节点，6节点，10节点这条路。回溯到6节点，又发现3节点，6节点，11节点这条路。最后回溯到根节点1，搜索工作完成。</p>
+<p>通过这个过程可以明显的感觉到深度优先搜索是一种一条路走到黑的搜索算法。</p>
+<h2 id="bfs"><a href="#bfs" class="headerlink" title="bfs"></a>bfs</h2><p><img src="https://www.z4a.net/images/2019/03/27/35e7b7a6ce3a912a4937eb5ae891b063.jpg" alt="二叉树.jpg"></p>
+<p>我们以同一棵二叉树为例，配合队列示意图，进行bfs的讲解。</p>
+<p>首先同样将根节点即1节点入队。</p>
+<p><img src="https://www.z4a.net/images/2019/03/28/629c2518999bca16a.jpg" alt="6.jpg"></p>
+<p>与dfs不同的是，我们不再只盯着1节点的某一个子节点，而是将所有1的子节点入队，很明显1的子节点有2节点和3节点，所以将2节点和3节点入队。与此同时，1节点完成了自己的使命，1节点出队。</p>
+<p><img src="https://www.z4a.net/images/2019/03/28/715fddd333e363943.jpg" alt="7.jpg"></p>
+<p>这时用同样的操作处理队首，即当前处于队首位置的2节点，搜索2节点的子节点可知4节点和5节点，将4、5两节点入队，2节点出队。</p>
+<p><img src="https://www.z4a.net/images/2019/03/28/87b5709f353fbc420.jpg" alt="8.jpg"></p>
+<p>搜索3节点，6节点入队，3节点出队。</p>
+<p><img src="https://www.z4a.net/images/2019/03/28/9f622bd9ba65ced8f.jpg" alt="9.jpg"></p>
+<p>然后是7、8两节点入队，4节点出队。</p>
+<p><img src="https://www.z4a.net/images/2019/03/28/10ef0bf3a1d93f2af7.jpg" alt="10.jpg"></p>
+<p>然后5节点出队，5节点的子节点9节点入队，6节点出队，10节点和11节点入队。</p>
+<p><img src="https://www.z4a.net/images/2019/03/28/1119ee0b902004cb60.jpg" alt="11.jpg"></p>
+<p>7节点到了队首的位置，对7节点进行搜索，发现7节点没有子节点，则只进行7节点的出队操作。同理，当前队列中五个节点全部出队之后，队列变成了空队列，广度搜索过程结束，搜索工作完成。</p>
+<p>而通过bfs，我们可以很清楚的感觉到，bfs完整的进行同层操作，在当前层的节点全部遍历后才会处理下一层的节点。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/dfs%E4%B8%8Ebfs%E7%AE%80%E5%8D%95%E8%BE%A8%E6%9E%90/">http://www.unknown9t.com/2022/04/29/dfs%E4%B8%8Ebfs%E7%AE%80%E5%8D%95%E8%BE%A8%E6%9E%90/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/dfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/" title="dfs习题讲解"><span>< PreviousPost</span><br><span class="prevTitle">dfs习题讲解</span></a><a class="nextSlogan" href="/2022/04/29/%E5%B8%B8%E7%94%A8%E6%8A%80%E5%B7%A7%E7%B2%BE%E9%80%89/" title="常用技巧精选"><span>NextPost ></span><br><span class="nextTitle">常用技巧精选</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dfs"><span class="toc-number">2.1.</span> <span class="toc-text">dfs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bfs"><span class="toc-number">2.2.</span> <span class="toc-text">bfs</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>常见素数筛 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">常见素数筛</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="数论"> 数论</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在数学的王国里，质数（也即素数）是数这个范围内一枚闪闪发光的重要宝石，很多公式和定理都与素数有关。这样，如何判断一个数是否是素数也是一个重要的问题，只不过这个问题的解法相当显而易见，那么我们的目光就要更多的放在对于判断素数的算法的性能的优化上了（更多的是时间复杂度）。</p>
+<span id="more"></span>
+
+<p>有关质数的定义和性质在这里就不过多阐述了，我在本篇文章中主要讲解三种素数筛法，分别是朴素筛，埃筛以及欧筛（再有别的我就不知道了……菜的我）。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="朴素筛"><a href="#朴素筛" class="headerlink" title="朴素筛"></a>朴素筛</h2><p>平时大家最常用的应该就是朴素筛了，这种筛法的原理依赖于素数的定义：在大于1的自然数中，除了1和它本身以外不再有其他因数的自然数。这样就衍生出了一种判断素数的方法，即把当前需要判断的数n作为被模除数，用n不断从2开始到n-1尝试模除，如果结果等于0，代表可以整除，即也代表该数除了1与它本身有其他因数，故不符合素数定义，达到判断素数的功能。</p>
+<h3 id="原理论证"><a href="#原理论证" class="headerlink" title="原理论证"></a>原理论证</h3><p>朴素筛的原理在上面大概讲清楚了，在这里我们主要论证两个问题。一个是从模除（2<del>n-1）优化到模除（2</del>sqrt(n)）的原理，还有就是对于朴素筛的时间复杂度的估算（虽然很简单）。</p>
+<p>这里先摆出一段判断2<del>n所有数是质数还是合数的核心代码（模除2</del>i-1）</p>
+<p>a数组中0代表该数是合数、1代表该数是质数</p>
+<pre><code>for(int i=2;i&lt;=n;i++)
+&#123;
+    for(int j=2;j&lt;=i-1;j++)
+    &#123;
+        if(i%j==0)
+        &#123;
+            a[i]=0;
+            break;
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>a数组在一开始都被赋了1为初值，代表所有数在未判别之前默认是质数（1除外，1另外赋值为0，因为不需要判断），当i（待判断数）能够整除j，则说明j是i的一个非1非本身因子，也即说明i不是一个质数，就可以赋值为0，不需要再向下进行尝试了。</p>
+<p>通过这里很明显可以得出大概时间复杂度为O(N^2)。</p>
+<p>再看一段经过优化的核心代码（模除2~sqrt(i)）</p>
+<pre><code>for(int i=2;i&lt;=n;i++)
+&#123;
+    for(int j=2;j&lt;=sqrt(i);j++)
+    &#123;
+        if(i%j==0)
+        &#123;
+            a[i]=0;
+            break;
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>这段代码的时间复杂度很明显也可以得出大概为O(N&amp;radic;N)。</p>
+<p>现在我们来论证一下这个小优化的正确性。</p>
+<p>首先我们可以看出来，这么优化造成的结果是不再尝试模除（sqrt(i)~i-1）区间的数。那么，不尝试这些数会不会对最终的判断结果造成什么影响呢？</p>
+<p>我们知道sqrt(i)&amp;times;sqrt(i)的结果就是i，那么当一个数x&gt;sqrt(i)时，如果i%x&#x3D;&#x3D;0，那么在2~sqrt(i)这个区间内一定有一个数k，能够使得i%k&#x3D;&#x3D;0，因为k&amp;times;x等于i。这样，在后面的区间内，如果存在i的非1非本身因子，则在前面的区间里，也存在这样一个因子，所以不需要遍历后面的区间了。</p>
+<p>另外，我遇到过有一些题目，会对这个小优化的时间复杂度进行限制，不用的话会TLE。</p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int main()
+&#123;	
+    int n;			//假定5000以内 
+    int a[5005];
+    scanf(&quot;%d&quot;,&amp;n);	
+    a[1]=0;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        a[i]=1;
+    &#125;
+    for(int i=2;i&lt;=n;i++)
+    &#123;
+        for(int j=2;j&lt;=sqrt(i);j++)
+        &#123;
+            if(i%j==0)
+            &#123;
+                a[i]=0;
+                break;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        printf(&quot;%d\n&quot;,a[i]);
+    &#125;
+    return 0;
+&#125; 
+</code></pre>
+<p>在这里我是用了一个数组来记录所有数是质数还是合数，但是在实际题目中，这个需求会有很多种，常见的可能会输出质数表或者判断某个数是否是质数，这可以视题目要求再进行具体变化。</p>
+<h2 id="埃筛"><a href="#埃筛" class="headerlink" title="埃筛"></a>埃筛</h2><p>埃筛是埃拉托斯特尼筛的简称，又叫(Eratosthenes筛)。是一种由希腊数学家埃拉托斯特尼所提出的一种简单检定素数的算法。要得到自然数n以内的全部素数，必须把不大于根号n的所有素数的倍数剔除，剩下的就是素数。（百度百科）</p>
+<p>埃筛通过提前标记质数的倍数为合数避免了很多数的判断，相当于利用了质数的性质进行了算法的优化，成功的降低了时间复杂度。</p>
+<h3 id="原理论证-1"><a href="#原理论证-1" class="headerlink" title="原理论证"></a>原理论证</h3><p>我们在放出代码之后再进行埃筛的时间复杂度分析，现在这里主要来论证埃筛的大致原理以及埃筛内容中的一点小优化。</p>
+<p>正如上面所说，埃筛的思想大概就是利用了质数不能有非1非本身其他因子的出现，而质数的倍数一定是一个合数这个性质（其实合数的倍数也是合数，但是合数的倍数会在之前被标记到），避免了外部循环遍历到该质数时的朴素判断。</p>
+<p>原理上来说，我们仍然在一开始假定所有数都是质数，从2开始，对2的所有小于n的倍数进行标记，标记它们为合数，在之后的遍历中，如果遍历到合数则无需再次判断，也不需要再标记该合数的倍数（因为该合数的倍数一定也是标记这个合数的质数的倍数，一定也已经被标记过了）。而遍历到3时，3没有被标记为合数，则需标记3的倍数······</p>
+<p>标记的结果如下图所示，1既不是质数也不是合数，所以用黑色涂满。2、3、5、7的倍数分别用蓝色、橙色、绿色、紫色来涂满。剩下的白色的数代表质数。</p>
+<p><img src="https://www.z4a.net/images/2020/03/26/1.1.2.png" alt="1.1.2.png"></p>
+<p>那么这里有一个问题，我们可以直观地看出3是个质数，它被筛过理所应当，但是有没有合数被错误的筛过呢？</p>
+<p><img src="https://www.z4a.net/images/2020/03/26/1.2.png" alt="1.2.png"></p>
+<p>我们现在假设一个数x为合数，而x一定存在至少一个非1非本身因数a（可能两个因数相同）。假设a本身是个合数，则它与x本质上没有区别，仍然至少存在一个非1非本身因数。而假设a本身是个质数，则该合数就已经被标记。而假如该数a是合数，a因数也是一个合数，也不过是将这个判断过程不断传递下去，最终会在一个无法被分成合数&amp;times;合数的节点上变成质数&amp;times;质数或者是质数&amp;times;合数。总归是会被一个质数标记的，这样子就证明了埃筛理论上的严谨性与健壮。</p>
+<p>现在我们来说一点小优化</p>
+<p><img src="https://www.z4a.net/images/2020/03/26/1.3.2.png" alt="1.3.2.png"></p>
+<p>埃筛的基础思想是对质数的倍数进行标记，我们很容易就可以在前几个质数中发现重复判断的数（如上图所示红圈圈出来的），在2的倍数时，2&amp;times;3&#x3D;6需要被标记，但是在3的倍数时，3&amp;times;2&#x3D;6也需要被标记一次，这里就造成了重复判断，而随着n的增大，这样的重复判断会越来越多，造成时间浪费，所以，这里衍生出了一种巧妙地小优化。就是在对i的倍数进行标记时（假设i已经是个质数），从i&amp;times;i开始判断，即从i的i倍开始判断。</p>
+<p>那么这么优化到底有没有道理呢？我们来看一看。</p>
+<p>对于3&amp;times;2（3的2倍）需要打标记这次判断，3的2倍也同样是2的3倍，就不用再进行判断了，故i&#x3D;3时，可以从i本身也就是3倍开始进行标记。有的读者可能会说，这是两个质数相乘，那如果一个质数和一个合数相乘呢？（不要说两个合数，动动脑子）。我们来看，首先，不可能遍历到一个合数然后标记该合数的质数倍（前面已经说明了）。所以，如果出现这种情况，那一定是遍历到一个质数然后标记该质数的合数倍，我们举个例子。假设遍历到5，此时应该标记5&amp;times;4&#x3D;20这个数为合数，那么在之前，这个数有没有被标记过呢？</p>
+<p>显而易见，20是2的倍数，被标记过了。那20被标记的过程是怎么样的呢？20作为一个合数4的倍数，也是标记4的质数2的倍数，所以在遍历2时就会被标记，所以质数和合数相乘时，从i&amp;times;i开始记录也是有所证明的。</p>
+<p>还有一个小优化也就是在一开始百度百科中说的那样，只需要去标记不大于根号n的所有素数的倍数，这样做也是有实际理论依据的。刚刚我们已经证明了对于一个质数i，从i&amp;times;i开始标记的正确性，那么对于一个大于根号n的质数j，我们不标记它的倍数会不会有问题。</p>
+<p>事实上是不会的，因为j&amp;times;j必然大于n，不需要判断。</p>
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int main()
+&#123;
+    int n;
+    int a[5005];
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=2;i&lt;=n;i++)
+    &#123;
+        a[i]=1;
+    &#125;	
+    a[1]=0;
+    for(int i=2;i&lt;=sqrt(n);i++)
+    &#123;
+        if(a[i]==1)			//如果是质数 
+        &#123;
+            for(int j=i*i;j&lt;=n;j+=i)
+            &#123;
+                a[j]=0;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        printf(&quot;%d=%d\n&quot;,i,a[i]);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h3 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h3><p>埃筛的时间复杂度很神奇的是O(nloglogn)，我们一般看到的时间复杂度都是O(n),O(n^2),O(logn)，几乎很少看到这种时间复杂度。</p>
+<p>看到之后我就去网上搜关于欧筛的时间复杂度的证明，也算是找到了几个。</p>
+<p>我把地址放在下面，正确性不明确（我也没证，只是简单的看了看），有兴趣的读者可以自行证明。</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Gavin_Nicholas/article/details/88974079" title="https://blog.csdn.net/Gavin_Nicholas/article/details/88974079">https://blog.csdn.net/Gavin_Nicholas&#x2F;article&#x2F;details&#x2F;88974079</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/OIljt12138/article/details/53861367" title="https://blog.csdn.net/OIljt12138/article/details/53861367">https://blog.csdn.net/OIljt12138/article/details/53861367</a></p>
+<p>在这里膜拜两位大佬。</p>
+<h2 id="欧筛"><a href="#欧筛" class="headerlink" title="欧筛"></a>欧筛</h2><p>欧筛是欧拉筛的简称，也叫（Euler筛），又叫线性筛，时间复杂度达到O(n)而得名。</p>
+<p>欧筛是埃筛的优化版本，在埃筛的介绍中，我们提到了埃筛的重复判断以及埃筛的小优化，但是埃筛本身的小优化并不能够完全去除重复筛选，只能去除两个因数相同的判断，对于因数不同的两次判断便无能为力了。我们来看12这个数。12&#x3D;3&amp;times;4&#x3D;2&amp;times;6，也就是说12这个数在埃筛中，会作为2的6倍筛一次，又会作为3的4倍筛一次，埃筛本身没有处理这个问题，于是引出了欧筛。</p>
+<p>欧筛本身的思想是对于每个合数，只筛最小质数的倍数那一次。</p>
+<h3 id="原理论证-2"><a href="#原理论证-2" class="headerlink" title="原理论证"></a>原理论证</h3><p>欧筛的思想没有什么新的思路需要证明，就在这里讲解一下欧筛的实现过程。</p>
+<p>欧筛的思想很好理解，但是代码实现不算很简单，需要作出一定思考：如何才能做到，永远只用最小质数筛合数。</p>
+<p>其实如果能想到这点就能想到，每次对于某一个数来说，如果这个数是质数，就把它记在一个数组里，做成一个素数表，用以查找。遍历每一个数i，让这个数i作为对之前所记录的所有质数的倍数来求得某一个质数的所有倍数。乍看起来好像并不严谨，但仔细思考之后会发现，这跟埃筛的i&amp;times;i开始有异曲同工之妙，而且这样做还可以方便的对于每一个数去遍历质数表，找到这个数的最小质因数，从而停止对该合数的多余判断。</p>
+<p>假如i%prime[j]&#x3D;&#x3D;0，那么j这个位置放的质数就是i的最小质因子了，prime[j+1]没有再去乘i的必要了。（prime数组是质数表）</p>
+<p>可以先尝试阅读代码，代码下面有图解。</p>
+<h3 id="代码实现-2"><a href="#代码实现-2" class="headerlink" title="代码实现"></a>代码实现</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int prim[5005];
+int num=0,sum=0;
+int a[5005];
+int main()
+&#123;
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=2;i&lt;=n;i++)
+    &#123;
+        a[i]=1;
+    &#125;
+    a[1]=0;
+    for(int i=2;i&lt;=n;i++)
+    &#123;
+        if(a[i]==1)
+        &#123;
+            num++;
+            prim[num]=i;
+        &#125;
+        for(int j=1;j&lt;=num;j++)
+        &#123;
+            sum++;
+            if(i*prim[j]&gt;n)
+            &#123;
+                break;
+            &#125;
+            a[i*prim[j]]=0;
+            if(i%prim[j]==0)
+            &#123;
+                break;
+            &#125;
+        &#125;
+    &#125;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        printf(&quot;%d=%d\n&quot;,i,a[i]);
+    &#125;
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<p><img src="https://www.z4a.net/images/2020/03/26/2.1.png" alt="2.1.png"></p>
+<p>虽然代码是我自己后来打的，但是大概还是先看了一篇博客的讲解，在这里给出这篇博客的地址。</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/2031036dba4b" title="https://www.jianshu.com/p/2031036dba4b">https://www.jianshu.com/p/2031036dba4b</a> </p>
+<p>总感觉欧筛还有别的实现方法，但在此先只说这一种吧，如果过后有所发现再补充。</p>
+<h3 id="时间复杂度分析-1"><a href="#时间复杂度分析-1" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h3><p>欧筛的时间复杂度众所周知O(n)（不然为啥叫线性筛啊）。</p>
+<p>可以很明显看出来，对于每一个数，都只判断了一次，也即对于每一个数，时间复杂度是O(1)。</p>
+<h3 id="欧筛拓展-ge-pi"><a href="#欧筛拓展-ge-pi" class="headerlink" title="欧筛拓展(ge pi)"></a>欧筛拓展(ge pi)</h3><p>跟欧筛有关的还有一个欧拉函数</p>
+<p>欧筛求素数表可以直接求得欧拉函数</p>
+<blockquote>
+<p>在数论，对正整数n，欧拉函数是小于或等于n的正整数中与n互质的数的数目（因此φ(1)&#x3D;1）。此函数以其首名研究者欧拉命名(Euler’s totient function)，它又称为Euler’s totient function、φ函数、欧拉商数等。 例如φ(8)&#x3D;4，因为1,3,5,7均和8互质。 从欧拉函数引伸出来在环论方面的事实和拉格朗日定理构成了欧拉定理的证明。</p>
+<p>————百度百科</p>
+</blockquote>
+<p>（具体的没咋看，过段时间再看，先到这里吧）</p>
+<h1 id="其他筛法"><a href="#其他筛法" class="headerlink" title="其他筛法"></a>其他筛法</h1><p>其实这些天在准备这篇博客的时候，也有看到很多别的筛法，就不举例子了，在这里只列举了三种最常见的筛法吧。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>好多天没有写博客了，这些字基本上一个上午码出来的，但是事先的查资料，捋顺思路还是花了一些时间，可能是最近心思没在这些上面吧，后面会慢慢回来。</p>
+<p>筛法大多是模板题，正式比赛筛法也基本上是作为预处理出现的，预处理的话总感觉朴素筛用处不大（因为谁都知道），不过总的来说，练习的话，模板题也够了。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/%E5%B8%B8%E8%A7%81%E7%B4%A0%E6%95%B0%E7%AD%9B/">http://www.unknown9t.com/2022/04/29/%E5%B8%B8%E8%A7%81%E7%B4%A0%E6%95%B0%E7%AD%9B/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2022/04/29/%E9%80%92%E6%8E%A8%E7%AE%97%E6%B3%95/" title="递推算法"><span>NextPost ></span><br><span class="nextTitle">递推算法</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%B4%E7%B4%A0%E7%AD%9B"><span class="toc-number">2.1.</span> <span class="toc-text">朴素筛</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E8%AE%BA%E8%AF%81"><span class="toc-number">2.1.1.</span> <span class="toc-text">原理论证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.1.2.</span> <span class="toc-text">代码实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%83%E7%AD%9B"><span class="toc-number">2.2.</span> <span class="toc-text">埃筛</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E8%AE%BA%E8%AF%81-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">原理论证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="toc-number">2.2.3.</span> <span class="toc-text">时间复杂度分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AC%A7%E7%AD%9B"><span class="toc-number">2.3.</span> <span class="toc-text">欧筛</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E8%AE%BA%E8%AF%81-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">原理论证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90-1"><span class="toc-number">2.3.3.</span> <span class="toc-text">时间复杂度分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AC%A7%E7%AD%9B%E6%8B%93%E5%B1%95-ge-pi"><span class="toc-number">2.3.4.</span> <span class="toc-text">欧筛拓展(ge pi)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E7%AD%9B%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">其他筛法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">小结</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

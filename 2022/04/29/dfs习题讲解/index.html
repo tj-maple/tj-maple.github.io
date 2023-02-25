@@ -1,0 +1,722 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>dfs习题讲解 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">dfs习题讲解</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="算法"> 算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="搜索算法"> 搜索算法</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="dfs"> dfs</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在我看来，每种算法都由两个部分组成，一部分是思想，另外一部分就是实现能力，二者缺一不可。缺少思想，算法就无法站住，或者可以说固定的模板无法和灵活的题目相联系。缺少实现能力，算法就成了空中楼阁，你想到的思路再清晰再高明，打不出来终究是心有余力不足。</p>
+<span id="more"></span>
+
+<p>在这篇博客中我将根据具体例题讲解部分dfs思路，正如上面所说，思想和实现能力是相辅相成的，我在这里理清了思路，还需要进行一个系列题目的练习，才能说把思路巩固了。如果有能力再进行高级的练习以及对于题目变形的解答。我希望在讲解的过程中也可以教学相长，如有错漏还请不吝赐教。</p>
+<h1 id="正文（例题）"><a href="#正文（例题）" class="headerlink" title="正文（例题）"></a>正文（例题）</h1><h2 id="HDU-2553-N皇后问题"><a href="#HDU-2553-N皇后问题" class="headerlink" title="HDU 2553 N皇后问题"></a>HDU 2553 N皇后问题</h2><p>n皇后问题就是最经典的dfs问题，一般的n皇后问题主要求解的是解的个数或者摆放的位置图。</p>
+<h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="http://http//acm.hdu.edu.cn/showproblem.php?pid=2553" title="http://acm.hdu.edu.cn/showproblem.php?pid=2553">http://acm.hdu.edu.cn/showproblem.php?pid=2553</a></p>
+<p><img src="https://www.z4a.net/images/2019/04/15/dfs-.jpg" alt="dfs-1.jpg"></p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>我对思路的讲解将以八皇后为例子，即n取8时的思路。</p>
+<p>首先，画出一个8*8的表格。</p>
+<p><img src="https://www.z4a.net/images/2019/04/15/dfs-1.1.jpg" alt="dfs-1.1.jpg"></p>
+<p>据题意可知，对于某一个点是否可以放置皇后的条件是同行同列或者一条斜线上不存在皇后。</p>
+<p>我们从第一个点即[1][1]开始试图放置，由于同行同列以及一条斜线均无皇后（下称条件），故在[1][1]处放置皇后。</p>
+<p><img src="https://www.z4a.net/images/2019/04/26/dfs-1.2.jpg" alt="dfs-1.2.jpg"></p>
+<p>而在此时，按照普通的搜索方式，应该从[1][2]试图放置。但很明显[1][1]与[1][2]同处一行，违背了条件，可知一旦在该行放置了皇后就应该跳到下一行进行搜索，以减小时间复杂度。根据这些特性，我们可以规定棋盘的每一行为一层，进行不断的递归操作来遍历，这就是dfs的大概形式。</p>
+<p>正如上段所说，第一行已经放置了皇后，搜索通过递归跳到了第二层，也就是第二行中。在第一个位置即[2][1]进行判断。由于第一列中已有皇后放置（[1][1]），故判断下一个位置[2][2]，由于同一斜线存在皇后（[1][1]），不满足条件故判断下一个位置[2][3]，发现满足条件，将第二行的皇后放置在第三列。</p>
+<p><img src="https://www.z4a.net/images/2019/04/26/dfs-1.3.jpg" alt="dfs-1.3.jpg"></p>
+<p>第二行也已经放置了皇后，通过递归跳到第三行，很明显第三行首先放在第五列，即[3][5]处。</p>
+<p><img src="https://www.z4a.net/images/2019/04/26/dfs-1.4.jpg" alt="dfs-1.4.jpg"></p>
+<p>dfs到达了第四层，第一列的位置由于已经放置了皇后（[1][1]），故跳过。[4][2]这个位置满足条件，故将皇后放置在此处。</p>
+<p><img src="https://www.z4a.net/images/2019/04/26/dfs-1.5.jpg" alt="dfs-1.5.jpg"></p>
+<p>据此规则判断出第五行放置在第四列即[5][4]处。</p>
+<p><img src="https://www.z4a.net/images/2019/04/26/dfs-1.8.jpg" alt="dfs-1.6.jpg"></p>
+<p>dfs到达第六层，可知前五列均无法放置皇后，而后三列也均由于前三行与其同处一条斜线上而不满足条件，如此第六行在当前状态没有满足条件的位置。故dfs进行回溯操作，dfs回溯至第五层。</p>
+<p>在第五行的当前位置也即[5][4]处已被证明不行，则在下一个位置尝试即[5][5]，当然由于[3][5]与该位置处于同一列，不满足条件。在[5][6]和[5][7]都因为条件不满足而跳到下个位置，在[5][8]这个位置当前可行，则尝试该位置。</p>
+<p><img src="https://www.z4a.net/images/2019/05/01/dfs-1.9.jpg" alt="dfs-1.7.jpg"></p>
+<p>在第六行所有位置仍然均不满足条件，如此回溯到第五层，然而第五层已经到了最后一个位置，如此回溯第四层，尝试[4][7]这个位置。</p>
+<p><img src="https://www.z4a.net/images/2019/05/01/dfs-1.10.jpg" alt="dfs-1.8.jpg"></p>
+<p>通过各种尝试，得出第一种情况。</p>
+<p><img src="https://www.z4a.net/images/2019/05/05/dfs-1.11.jpg" alt="dfs-1.11.jpg"></p>
+<p>所有摆放情况都尝试过之后，总共有92种情况。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>下面放出我针对hdu2553 N皇后问题打出的代码：</p>
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+#include&lt;math.h&gt;
+int sum=0,i,j;
+int num[15]=&#123;0&#125;;
+int q;
+int lie[15];
+int t;
+bool pd(int m,int o)
+&#123;
+    for(j=1;j&lt;=m-1;j++)
+    &#123;
+        if(lie[j]==o||abs(lie[j]-o)==abs(j-m))
+        &#123;
+            return false;
+        &#125;
+    &#125;
+    return true;
+&#125;
+void dfs(int n)
+&#123;
+    if(n==q+1)
+    &#123;
+        sum++;
+        return;
+    &#125;
+    else
+    &#123;
+        for(i=1;i&lt;=q;i++)
+        &#123;
+            if(pd(n,i))
+            &#123;
+                lie[n]=i;
+                dfs(n+1);
+                i=lie[n];
+            &#125;
+        &#125;
+    &#125; 
+&#125;
+int main()
+&#123;
+    for(q=1;q&lt;=10;q++)
+    &#123;
+        sum=0;
+        memset(lie,0,sizeof(lie));
+        dfs(1);
+        num[q]=sum;
+    &#125;
+    while(1)
+    &#123;
+        sum=0;
+        scanf(&quot;%d&quot;,&amp;t);
+        if(t==0)
+        &#123;
+            break;
+        &#125;
+        printf(&quot;%d\n&quot;,num[t]);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>其中某些地方可以进行优化来缩减空间或者时间，但由于高中这么学的，所以在此就不作多少改动了。</p>
+<h2 id="洛谷-P1605-迷宫"><a href="#洛谷-P1605-迷宫" class="headerlink" title="洛谷 P1605 迷宫"></a>洛谷 P1605 迷宫</h2><p>一个简单的裸dfs问题，当然用bfs也能做。</p>
+<h3 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1605" title="https://www.luogu.org/problem/P1605">https://www.luogu.org/problem/P1605</a></p>
+<p><img src="https://www.z4a.net/images/2019/05/29/dfs-2.1.jpg" alt="dfs-2.1.jpg"></p>
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>下面我随便给出一组数据(题目样例给的太简单了……)来作图进行解释。</p>
+<p>作图如下</p>
+<p><img src="https://www.z4a.net/images/2019/06/01/dfs-2.2.jpg" alt="dfs-2.2.jpg"></p>
+<p>蓝色方块表示起点，红色方块表示终点，黑色方块表示障碍物。</p>
+<p>像以前的dfs讲解一样，我们也做一个堆栈用来解释递归过程。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.3.jpg" alt="dfs-2.3.jpg"></p>
+<p>首先，我们将(1,1)也就是起始点入栈。然后在每个当前格子，对于四个方向的试探定一个先后顺序，我在这里规定先向右试探，然后按顺时针顺序旋转。</p>
+<p>按照这个顺序，我们首先应该试探(1,1)的右侧格子即(1,2)即(1+0,1+1)发现该格子既没有在地图边界之外，也是一个可行的格子(不是墙)。若该格子为目标点，则方案数应当加一，并且回溯。但很明显这个格子只是一个普通的可行点，把该格子入栈。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.4.jpg" alt="dfs-2.4.jpg"></p>
+<p>接下来，对于当前格子即(1,2)的四个方向可行性进行试探，按照规定，我们首先试探(1,2)右侧的格子即(1,3)，发现可行，进行入栈操作。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.5.jpg" alt="dfs-2.5.jpg"></p>
+<p>而对于(1,3)这个点，首先仍然按照规定，试探该点右侧的格子，发现是墙，即不可行点。故按照我先前定的规则，试探该点下侧的格子即(2,3)，发现该点可行，故入栈。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.6.jpg" alt="dfs-2.6.jpg"></p>
+<p>由此由于该线路剩下所有点右侧均为墙，均不可行，故均向下试探，省略过程。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.7.jpg" alt="dfs-2.7.jpg"></p>
+<p>最后，(4,3)点入栈，对于该点的右侧，下侧，左侧三个方向的试探均失败。向上试探时，(3,3)点虽然可行，但是该点在之前的路线中已经存在，故仍然不可再次访问，这点要记住，不然可能会出现无限循环情况。</p>
+<p>对于(4,3)点四个方向的试探均失败，故进行回溯操作，回溯到上一层，即栈顶为(3,3)。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.8.jpg" alt="dfs-2.8.jpg"></p>
+<p>而对于(3,3)这个点来说，向下的试探已经做完，按照规定，向左试探与向上试探均失败，故进行回溯操作，回溯到(2,3)。按此规则，最终回溯到初始状态，即只有(1,1)在栈内的状态。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.3.jpg" alt="dfs-2.3.jpg"></p>
+<p>对于初始点即(1,1)的向右试探已经完成，执行向下试探，发现(2,1)可行，故将(2,1)入栈。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.9.jpg" alt="dfs-2.9.jpg"></p>
+<p>由此规则，直到(6,1)入栈，向右试探才变得可行，故(6,2)入栈。</p>
+<p>按照规则，走到一半将呈现如下线路图。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.10.jpg" alt="dfs-2.10.jpg"></p>
+<p>在当前点即(7,8)按逆时针试探，应试探(7,7)点，(7,7)点可行，入栈，但是对于(7,7)来说，四个方向均失败，故回溯，在(7,8)点时，只能向上试探，故形成如下线路图。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.11.jpg" alt="dfs-2.11.jpg"></p>
+<p>在(6,4)点时，对四个方向试探均失败，故回溯。同理，回溯到了(5,8)，在该点向上试探，(4,8)，(3,8)接连入栈，走入了目标点所在路线。</p>
+<p><img src="https://www.z4a.net/images/2019/06/03/dfs-2.12.jpg" alt="dfs-2.12.jpg"></p>
+<p>方案数加一，并且因为到达目标点，回溯到上一层，即(3,7)。由于(3,7)对于上边的试探失败，故再次回溯到(3,8)，此次向上试探可行，故走入(2,8)(1,8)(1,7)(1,6)这条路。</p>
+<p>路已经走到头，很明显可以得到一直回溯到(8,2)的结论。故当前栈顶为(8,2)。对于(8,2)来说，向右试探已经结束，向下试探越界不可行，向左试探可行，到达(8,1)到达(7,1)却无路可走，又回溯到(8,2)。</p>
+<p>又回溯到(7,2)，向左试探，(7,1)入栈，(8,1)入栈，(8,2)入栈，再次进行之前那轮右侧的操作，直到又找到一种方案。方案数加一，很明显再次回溯到(7,2)，这次仍需回溯到(6,2)(6,1)。</p>
+<p>将此过程进行完毕后，得出最终的方案数。</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int xa[8]=&#123;1,0,0,-1&#125;;
+int ya[8]=&#123;0,1,-1,0&#125;;
+int a[10][10]=&#123;0&#125;;
+int mak[10][10]=&#123;0&#125;;
+int sum=0;
+int n,m,t;
+int sx,sy,fx,fy,tx,ty;
+void dfs(int x,int y)	
+&#123;
+    if(x==0||x==n+1||y==0||y==m+1)
+    &#123;
+        return;
+    &#125;
+    else if(a[x][y]==1||mak[x][y]==1)
+    &#123;
+        return;
+    &#125;
+    else if(x==fx&amp;&amp;y==fy)
+    &#123;
+        sum++;
+        return;
+    &#125;
+    else	
+    &#123;
+        mak[x][y]=1;
+        for(int k=0;k&lt;=3;k++)
+        &#123;
+            dfs(x+xa[k],y+ya[k]);
+        &#125;
+        mak[x][y]=0;
+    &#125;
+&#125;	
+int main()
+&#123;
+    int i;
+    scanf(&quot;%d%d%d&quot;,&amp;n,&amp;m,&amp;t);
+    scanf(&quot;%d%d%d%d&quot;,&amp;sx,&amp;sy,&amp;fx,&amp;fy);
+    for(i=1;i&lt;=t;i++)
+    &#123;
+        scanf(&quot;%d%d&quot;,&amp;tx,&amp;ty);
+        a[tx][ty]=1;
+    &#125;
+    dfs(sx,sy);
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1706-全排列问题"><a href="#洛谷-P1706-全排列问题" class="headerlink" title="洛谷 P1706 全排列问题"></a>洛谷 P1706 全排列问题</h2><p>比较经典的问题，没啥好解释的，特别注意的也就是输出格式。</p>
+<h3 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1706" title="https://www.luogu.org/problem/P1706">https://www.luogu.org/problem/P1706</a></p>
+<p><img src="https://www.z4a.net/images/2019/06/04/dfs-3.1.jpg" alt="dfs-3.1.jpg"></p>
+<h3 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h3><p>输出自然数1到n所有不重复的排列，用我们的思维方式，很容易看出可以用dfs来解。</p>
+<p>我们在此将第k次选择的数字，作为第k层的数字。以输入样例即3为例：每层都有三个可选项(1,2,3)，但是条件是已经选过的数字不可以再次选中，我们便可以用数组记录是否已经选中。</p>
+<p>第一次也即第一层选中1，第二层选中2，第三层选中3。而到了这时候，k即层数已经等于n，答案序列已经得到了一个，故将其输出。</p>
+<p>然后进行回溯操作，回溯到第二层，第二层选中3，第三层选中2，得到第二个答案。</p>
+<p>如此操作，得出并且按格式输出全部答案。</p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int n;
+int sum=0;
+int v[15]; 
+int b[15];
+void dfs(int ceng)
+&#123;
+    int k;
+    for(int i=1;i&lt;=n;i++)
+    &#123;
+        if(v[i]==0)
+        &#123;
+            sum++;
+            b[sum]=i;
+            v[i]=1;
+            dfs(ceng+1);
+            sum--;
+            v[i]=0;
+        &#125;
+    &#125;
+    if(ceng==n)
+    &#123;
+        for(k=1;k&lt;=n;k++)
+        &#123;
+            printf(&quot;%5d&quot;,b[k]);
+        &#125;
+        printf(&quot;\n&quot;);
+        return;
+    &#125;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d&quot;,&amp;n);
+    dfs(1);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1036-选数"><a href="#洛谷-P1036-选数" class="headerlink" title="洛谷 P1036 选数"></a>洛谷 P1036 选数</h2><h3 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1036" title="https://www.luogu.org/problem/P1036">https://www.luogu.org/problem/P1036</a></p>
+<p><img src="https://www.z4a.net/images/2019/06/20/dfs-5.1.jpg" alt="dfs-5.1.jpg"></p>
+<h3 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h3><p>很明显，这道题是一道组合，按照我们正常的思维方式，自然能够想到dfs的解题思路。限界条件就是已选择的数字个数等于要求选择的数字个数。</p>
+<p>以题目中所给数据为例，我们把第几个选择的数字当作第几层。如此，第一层我们首先选择第一个数字即3，然后第二层选择3之后的第一个数字即7，第三层选择12。已经选择了三个数字，进行判定，3+7+12&#x3D;22，22不是一个素数，故总数不变。</p>
+<p>判定结束后，第三层重新选择，选择当前数字即12的下一个数字19。进行判定，3+7+19&#x3D;29是一个素数，故总数加一。这时第三层应该重新选择，但是19后面没有数字了，故第三层回溯到第二层，第二层进行重新选择，第二层选择了下一个数字即12，第三层选择19。3+12+19&#x3D;38，38不是一个素数。</p>
+<p>第三层无法重新选择，回溯第二层，第二层重新选择到了19，第三层又没数可选，故回溯到第二层，回溯到第一层，第一层选择下一个数字即7，第二层是12，第三层是19。7+12+19&#x3D;34，不是一个素数。之后无情况出现，第一层无法选择，dfs结束。</p>
+<h3 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+int n,k;
+int a[25];
+int sum=0,sum1=0;
+int pd(int shu)
+&#123;
+    int i;
+    for(i=2;i&lt;=sqrt(shu);i++)
+    &#123;
+        if(shu%i==0)
+        &#123;
+            return 0;
+        &#125;
+    &#125;
+    return 1;
+&#125;
+void dfs(int ceng,int ge)
+&#123;
+    if(ceng==k)
+    &#123;
+        sum+=a[ge];
+        if(pd(sum)==1)
+        &#123;
+            sum1++;
+        &#125;
+        sum-=a[ge];
+        return;
+    &#125;
+    else
+    &#123;
+        sum+=a[ge];
+        for(int j=ge+1;j&lt;=n;j++)
+        &#123;
+            dfs(ceng+1,j);
+        &#125;
+        sum-=a[ge];
+    &#125;
+&#125;
+int main()
+&#123;
+    int i;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        scanf(&quot;%d&quot;,&amp;a[i]);
+    &#125;
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        dfs(1,i);
+    &#125;
+    printf(&quot;%d&quot;,sum1);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-AT1350-深さ優先探索"><a href="#洛谷-AT1350-深さ優先探索" class="headerlink" title="洛谷 AT1350 深さ優先探索"></a>洛谷 AT1350 深さ優先探索</h2><h3 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/AT1350" title="https://www.luogu.org/problem/AT1350">https://www.luogu.org/problem/AT1350</a></p>
+<p><img src="https://s2.ax1x.com/2019/06/22/ZplZ0e.jpg" alt="dfs-6.1.jpg"></p>
+<h3 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h3><p>题目问高桥先生能否到达鱼店，很明显是一个地图类的搜索。地图类的搜索我也在上面的迷宫中讲过。这类题用dfs和bfs都可以，但是由于dfs代码编写简单，故我在此用dfs解题。</p>
+<p>迷宫一题问有多少种方案，而这个题目问是否能够到达。这就是两个题目最大的区别，这个区别体现在已经回溯过的点是否有必要再次经过。对于这种是否连通的题目，已经回溯过的点确实可以再次经过，但该点衍生出的路径均已被证伪（若可以通向终点则已经跳出了搜索过程），所以再次对于该点的操作都是浪费时间。故我们可以记录每一个点是否已经经过。这种去掉无用操作的技巧叫做剪枝。</p>
+<p>通过剪枝，我们可以大幅降低时间复杂度，在某些题目中，不剪枝会导致TLE（超时）。</p>
+<h3 id="代码-4"><a href="#代码-4" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int jl=0;
+char a[505][505];
+int b[505][505]=&#123;0&#125;;
+int n,m;
+int xa[6]=&#123;1,-1,0,0&#125;;
+int ya[6]=&#123;0,0,1,-1&#125;;
+void dfs(int x,int y)
+&#123;
+    if(a[x][y]==&#39;g&#39;)
+    &#123;
+        jl=1;
+    &#125;
+    else if(x==0||x==n+1||y==-1||y==m||a[x][y]==&#39;#&#39;)
+    &#123;
+        return;
+    &#125;
+    else
+    &#123;
+        for(int k=0;k&lt;=3;k++)
+        &#123;
+            if(b[x+xa[k]][y+ya[k]]==0)
+            &#123;
+                b[x+xa[k]][y+ya[k]]=1;
+                dfs(x+xa[k],y+ya[k]);
+            &#125;
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    int bei,bej;
+    int i,j; 
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    char c=getchar();
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        gets(a[i]);
+    &#125;
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=0;j&lt;=m-1;j++)
+        &#123;
+            if(a[i][j]==&#39;s&#39;)
+            &#123;
+                bei=i;
+                bej=j;
+            &#125;
+        &#125;
+    &#125;
+    dfs(bei,bej);
+    if(jl==1)
+    &#123;
+        printf(&quot;Yes&quot;);
+    &#125;
+    else
+    &#123;
+        printf(&quot;No&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<h2 id="POJ-2386-Lake-Counting"><a href="#POJ-2386-Lake-Counting" class="headerlink" title="POJ 2386 Lake Counting"></a>POJ 2386 Lake Counting</h2><h3 id="题目-5"><a href="#题目-5" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="http://poj.org/problem?id=2386" title="http://poj.org/problem?id=2386">http://poj.org/problem?id=2386</a></p>
+<p><img src="https://www.z4a.net/images/2019/06/24/dfs-7.1.jpg" alt="dfs-7.1.jpg"></p>
+<h3 id="思路-5"><a href="#思路-5" class="headerlink" title="思路"></a>思路</h3><p>这道题的表述大概为一个代表水的格子(W)，若周围八格也存在代表水的格子，则这些代表水的格子是同一个湖，最后要求得出湖的个数。</p>
+<p>很明显的，该题是一道地图类搜索，bfs和dfs都可以做，但还是由于dfs编写简单，我选择用dfs解答。与一般的地图形dfs最显性的不同就是转移的方向由4个变成了8个。</p>
+<p>我对题目所给的样例进行解释，题目给出的是10个字符串，首先需要对这些字符串进行处理，当然我把字符放进了二维数组（也可以把字符转化成数字放到二维整形数组中）。</p>
+<p>总体的思路略有不同，因为询问整个地图中湖的个数，我们需要对整个地图进行穷竭搜索，对每一个点进行访问，判断是否是一个新的湖。有人可能会问，这不是没用dfs嘛……这里就出现了一个问题，新发现的这个W，是否与以前数过的W处于同一湖中，对于这个问题，我们进行如下操作。</p>
+<p><img src="https://www.z4a.net/images/2019/06/26/dfs-7.2.jpg" alt="dfs-7.2.jpg"></p>
+<p>对于新发现的一个W，对该位置进行dfs搜索（具体搜索的过程与上述地图类dfs相差无几）。穷竭搜索过程中，发现了（1，1）这个点的W，首先把该点的值赋成代表无水点的标志（这一步至关重要！！！），对于该点进行dfs搜索过程，我们从右侧开始逆时针进行试探，可以发现右侧直到下侧都没有W，到了右下的点即（2，2），发现了W，第二层变成了（2，2），与此同时，这个点也被赋值成点。dfs过程结束之后，处于地图左上角的这个湖已经被填成了平地，并且湖的总个数已经变成了1。至此，对于（1，1）这个点的穷竭搜索已经完成，向后面进行搜索。</p>
+<p>下一个新出现的W在（1，10）这个点，按照上述方式填平右侧的湖，湖的总数目变成了2。</p>
+<p>随后，前五行均为代表平地的标志了。穷竭搜索到了第六行，搜索到了（6，3）这个点，对该点进行dfs之后，左下角的湖已经填平，总数变成了3，整个地图已经全变成了平地，穷竭搜索仍然会一直搜索到最后一行的最后一个节点。</p>
+<h3 id="代码-5"><a href="#代码-5" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+char a[105][105];
+int xa[8]=&#123;1,1,1,0,0,-1,-1,-1&#125;;
+int ya[8]=&#123;1,0,-1,1,-1,1,0,-1&#125;;
+int sum=0;
+int n,m;
+int i,j;
+void dfs(int x,int y)
+&#123;
+    if(x==0||x==n+1||y==0||y==m+1)
+    &#123;
+        return;
+    &#125;
+    else if(a[x][y]==&#39;.&#39;)
+    &#123;
+        return;
+    &#125;
+    else
+    &#123;
+        a[x][y]=&#39;.&#39;;
+        for(int k=0;k&lt;=7;k++)
+        &#123;
+            dfs(x+xa[k],y+ya[k]);
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    char c=getchar();
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=1;j&lt;=m;j++)
+        &#123;
+            scanf(&quot;%c&quot;,&amp;a[i][j]);
+        &#125;
+        c=getchar();
+    &#125;
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=1;j&lt;=m;j++)
+        &#123;
+            if(a[i][j]==&#39;W&#39;)
+            &#123;
+                sum++;
+                dfs(i,j);
+            &#125;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1451-求细胞数量"><a href="#洛谷-P1451-求细胞数量" class="headerlink" title="洛谷 P1451 求细胞数量"></a>洛谷 P1451 求细胞数量</h2><h3 id="题目-6"><a href="#题目-6" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1451" title="https://www.luogu.org/problem/P1451">https://www.luogu.org/problem/P1451</a></p>
+<p><img src="https://www.z4a.net/images/2019/06/26/dfs-8.1.jpg" alt="dfs-8.1.jpg"></p>
+<h3 id="思路-6"><a href="#思路-6" class="headerlink" title="思路"></a>思路</h3><p>与上一道POJ的题目思路一样，不同的是这道题中数字1~9代表细胞。</p>
+<p>没啥好说的……</p>
+<h3 id="代码-6"><a href="#代码-6" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+char a[105][105];
+int xa[8]=&#123;1,0,0,-1&#125;;
+int ya[8]=&#123;0,1,-1,0&#125;;
+int sum=0;
+int n,m;
+int i,j;
+void dfs(int x,int y)
+&#123;
+    if(x==0||x==n+1||y==-1||y==m)
+    &#123;
+        return;
+    &#125;
+    else if(a[x][y]==&#39;0&#39;)
+    &#123;
+        return;
+    &#125;
+    else
+    &#123;
+        a[x][y]=&#39;0&#39;;
+        for(int k=0;k&lt;=3;k++)
+        &#123;
+            dfs(x+xa[k],y+ya[k]);
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    char c=getchar();
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        scanf(&quot;%s&quot;,a[i]);
+    &#125;
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=0;j&lt;=m-1;j++)
+        &#123;
+            printf(&quot;%c&quot;,a[i][j]);
+        &#125;
+    printf(&quot;\n&quot;);
+    &#125;
+    for(i=1;i&lt;=n;i++)
+    &#123;
+        for(j=0;j&lt;=m-1;j++)
+        &#123;
+            if(a[i][j]!=&#39;0&#39;)
+            &#123;
+                sum++;
+                dfs(i,j);
+            &#125;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="POJ-1088-滑雪"><a href="#POJ-1088-滑雪" class="headerlink" title="POJ 1088 滑雪"></a>POJ 1088 滑雪</h2><h3 id="题目-7"><a href="#题目-7" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="http://poj.org/problem?id=1088" title="http://poj.org/problem?id=1088">http://poj.org/problem?id=1088</a></p>
+<p><img src="https://www.z4a.net/images/2019/06/26/dfs-9.1.jpg" alt="dfs-9.1.jpg"><br><img src="https://www.z4a.net/images/2019/06/26/dfs-9.2.jpg" alt="dfs-9.2.jpg"></p>
+<h3 id="思路-7"><a href="#思路-7" class="headerlink" title="思路"></a>思路</h3><p>这道题也是一道地图类的搜索问题，但是与上述题都有不同的是这道题的数据范围，行数和列数最大值都为100，而对于每个点进行dfs相当于最大10^4次dfs，再细化计算的话基本可以确定会TLE。</p>
+<p>但是自己模拟两遍的话就又会发现一些特征，如果这条路是递减的话，无论从哪里走到这里，这条路都是递减的，所以我就会有这样一个想法：是不是可以直接在那个位置直接记录由该位置所联通的最长路径。当由其他点经由dfs到达该点可以直接继承该点的最长路径数而不用多次进行重复操作，这也算另一种意义上的剪枝。</p>
+<p>（貌似是叫做记忆化搜索？？？）</p>
+<h3 id="代码-7"><a href="#代码-7" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int h[105][105],v[105][105];
+int xa[8]=&#123;1,0,0,-1&#125;;
+int ya[8]=&#123;0,1,-1,0&#125;;
+int r,c;
+int sum,max1,max;
+void dfs(int x,int y)
+&#123;
+    if(x==0||x==r+1||y==0||y==c+1)
+    &#123;
+        return;
+    &#125;
+    else if(v[x][y]!=1)
+    &#123;
+        sum+=v[x][y];
+        if(sum&gt;max1)
+        &#123;
+            max1=sum;
+        &#125;
+        if(sum&gt;max)
+        &#123;
+            max=sum;
+        &#125;
+        sum-=v[x][y];
+        return;
+    &#125;
+    else
+    &#123;
+        sum+=1;
+        if(sum&gt;max)
+        &#123;
+            max=sum;
+        &#125;
+        if(sum&gt;max1)
+        &#123;
+            max1=sum;
+        &#125;
+        for(int k=0;k&lt;=3;k++)
+        &#123;
+            if(h[x+xa[k]][y+ya[k]]&lt;h[x][y])
+            &#123;
+                dfs(x+xa[k],y+ya[k]);
+            &#125;
+        &#125;
+        sum-=1;
+    &#125;
+&#125;
+int main()
+&#123;
+    int i,j;
+    scanf(&quot;%d%d&quot;,&amp;r,&amp;c);
+    for(i=1;i&lt;=r;i++)
+    &#123;
+        for(j=1;j&lt;=c;j++)
+        &#123;
+            scanf(&quot;%d&quot;,&amp;h[i][j]);
+            v[i][j]=1;
+        &#125;
+    &#125;
+    for(i=1;i&lt;=r;i++)
+    &#123;
+        for(j=1;j&lt;=c;j++)
+        &#123;
+            dfs(i,j);
+            v[i][j]=max1;
+            max1=0;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,max);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="洛谷-P1506-拯救oibh总部"><a href="#洛谷-P1506-拯救oibh总部" class="headerlink" title="洛谷 P1506 拯救oibh总部"></a>洛谷 P1506 拯救oibh总部</h2><h3 id="题目-8"><a href="#题目-8" class="headerlink" title="题目"></a>题目</h3><p><a target="_blank" rel="noopener" href="https://www.luogu.org/problem/P1506" title="https://www.luogu.org/problem/P1506">https://www.luogu.org/problem/P1506</a></p>
+<p><img src="https://www.z4a.net/images/2019/08/12/dfs-10.1.jpg" alt="dfs-10.1.jpg"></p>
+<h3 id="思路-8"><a href="#思路-8" class="headerlink" title="思路"></a>思路</h3><p>我们通过看样例和题目可以看出，一个不会被淹到的区域，外围一定是* 。我们可以对最外围的一圈进行dfs，然后把所有的0也就是洪水可以淹没的地方赋值成* ，然后对整个地图进行搜索，查找0的数量。</p>
+<h3 id="代码-8"><a href="#代码-8" class="headerlink" title="代码"></a>代码</h3><pre><code>#include&lt;stdio.h&gt;
+int xa[5]=&#123;-1,0,1,0&#125;;
+int ya[5]=&#123;0,-1,0,1&#125;;
+char map[505][505];
+int n,m;
+int sum=0;
+void dfs(int x,int y)
+&#123;
+    for(int i=0;i&lt;=3;i++)
+    &#123;
+        if(x+xa[i]&gt;=0&amp;&amp;x+xa[i]&lt;=n&amp;&amp;y+ya[i]&gt;=0&amp;&amp;y+ya[i]&lt;=m)
+        &#123;
+            if(map[x+xa[i]][y+ya[i]]==&#39;0&#39;)
+            &#123;
+                map[x+xa[i]][y+ya[i]]=&#39;*&#39;;
+                dfs(x+xa[i],y+ya[i]);
+            &#125;
+        &#125;
+    &#125;
+&#125;
+int main()
+&#123;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=0;i&lt;=n-1;i++)
+    &#123;
+        scanf(&quot;%s&quot;,map[i]);
+    &#125;
+    for(int t=0;t&lt;=m;t++)
+        &#123;
+        if(map[0][t]==&#39;0&#39;)
+        &#123;
+            dfs(0,t);
+            map[0][t]=&#39;*&#39;;
+        &#125;	
+        if(map[n-1][t]==&#39;0&#39;)
+        &#123;
+            dfs(n-1,t);
+            map[n-1][t]=&#39;*&#39;;
+        &#125;
+    &#125;
+    for(int t=0;t&lt;=n;t++)
+    &#123;
+        if(map[t][0]==&#39;0&#39;)
+        &#123;
+            dfs(t,0);
+            map[t][0]=&#39;*&#39;;
+        &#125;
+        if(map[t][m-1]==&#39;0&#39;)
+        &#123;
+            dfs(t,m-1);
+            map[t][m-1]=&#39;*&#39;;
+        &#125;
+    &#125;
+    for(int i=0;i&lt;=n-1;i++)
+    &#123;
+        for(int j=0;j&lt;=m-1;j++)
+            &#123;
+            if(map[i][j]==&#39;0&#39;)
+            &#123;
+                sum++;
+            &#125;
+        &#125;
+    &#125;
+    printf(&quot;%d&quot;,sum);
+    return 0;
+&#125;
+</code></pre>
+<h1 id="未完待续……"><a href="#未完待续……" class="headerlink" title="未完待续……"></a>未完待续……</h1></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/dfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/">http://www.unknown9t.com/2022/04/29/dfs%E4%B9%A0%E9%A2%98%E8%AE%B2%E8%A7%A3/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/Floyd/" title="Floyd（弗洛伊德）"><span>< PreviousPost</span><br><span class="prevTitle">Floyd（弗洛伊德）</span></a><a class="nextSlogan" href="/2022/04/29/dfs%E4%B8%8Ebfs%E7%AE%80%E5%8D%95%E8%BE%A8%E6%9E%90/" title="dfs与bfs简单辨析"><span>NextPost ></span><br><span class="nextTitle">dfs与bfs简单辨析</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87%EF%BC%88%E4%BE%8B%E9%A2%98%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">正文（例题）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#HDU-2553-N%E7%9A%87%E5%90%8E%E9%97%AE%E9%A2%98"><span class="toc-number">2.1.</span> <span class="toc-text">HDU 2553 N皇后问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE"><span class="toc-number">2.1.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.1.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">2.1.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1605-%E8%BF%B7%E5%AE%AB"><span class="toc-number">2.2.</span> <span class="toc-text">洛谷 P1605 迷宫</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1706-%E5%85%A8%E6%8E%92%E5%88%97%E9%97%AE%E9%A2%98"><span class="toc-number">2.3.</span> <span class="toc-text">洛谷 P1706 全排列问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-2"><span class="toc-number">2.3.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-2"><span class="toc-number">2.3.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1036-%E9%80%89%E6%95%B0"><span class="toc-number">2.4.</span> <span class="toc-text">洛谷 P1036 选数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-3"><span class="toc-number">2.4.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-3"><span class="toc-number">2.4.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-3"><span class="toc-number">2.4.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-AT1350-%E6%B7%B1%E3%81%95%E5%84%AA%E5%85%88%E6%8E%A2%E7%B4%A2"><span class="toc-number">2.5.</span> <span class="toc-text">洛谷 AT1350 深さ優先探索</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-4"><span class="toc-number">2.5.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-4"><span class="toc-number">2.5.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-4"><span class="toc-number">2.5.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#POJ-2386-Lake-Counting"><span class="toc-number">2.6.</span> <span class="toc-text">POJ 2386 Lake Counting</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-5"><span class="toc-number">2.6.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-5"><span class="toc-number">2.6.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-5"><span class="toc-number">2.6.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1451-%E6%B1%82%E7%BB%86%E8%83%9E%E6%95%B0%E9%87%8F"><span class="toc-number">2.7.</span> <span class="toc-text">洛谷 P1451 求细胞数量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-6"><span class="toc-number">2.7.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-6"><span class="toc-number">2.7.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-6"><span class="toc-number">2.7.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#POJ-1088-%E6%BB%91%E9%9B%AA"><span class="toc-number">2.8.</span> <span class="toc-text">POJ 1088 滑雪</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-7"><span class="toc-number">2.8.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-7"><span class="toc-number">2.8.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-7"><span class="toc-number">2.8.3.</span> <span class="toc-text">代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%9B%E8%B0%B7-P1506-%E6%8B%AF%E6%95%91oibh%E6%80%BB%E9%83%A8"><span class="toc-number">2.9.</span> <span class="toc-text">洛谷 P1506 拯救oibh总部</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE-8"><span class="toc-number">2.9.1.</span> <span class="toc-text">题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF-8"><span class="toc-number">2.9.2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-8"><span class="toc-number">2.9.3.</span> <span class="toc-text">代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD%E2%80%A6%E2%80%A6"><span class="toc-number">3.</span> <span class="toc-text">未完待续……</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>

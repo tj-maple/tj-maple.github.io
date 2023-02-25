@@ -1,0 +1,152 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Maple"><meta name="renderer" content="webkit"><meta name="copyright" content="Maple"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>个人常用OJ平台 · Tang</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/cat.png"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Maple</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="//www.cactus1102.club" target="_black">D&amp;X</a></span><span><a href="//www.weihuiqi.com" target="_black">WHQ</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Tang</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">个人常用OJ平台</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2022-04-29</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="杂论"> 杂论</a></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>最近在搜其他博客所需要的例题时，惊奇的发现原来OJ平台极多，而且仍有一些很有价值，很美观的OJ平台我并没有发现，或者说发现了却经常忘记用。所以，在这篇博文中我将记载一些个人觉得有必要记录的网站，并且分列它们的特点（每一个OJ平台都不是十全十美的，我觉得一个网站有些不足也是特色）。</p>
+<span id="more"></span>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="hdu（杭州电子科技大学）"><a href="#hdu（杭州电子科技大学）" class="headerlink" title="hdu（杭州电子科技大学）"></a>hdu（杭州电子科技大学）</h2><p><a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/" title="航电OJ">http://acm.hdu.edu.cn/</a></p>
+<p>从高中开始，竞赛老师就在推荐这个网站，到了大学，主要看基础题也是这个网站。大概是中国最受欢迎的OJ平台之一，题目数量很多。</p>
+<p><img src="https://www.z4a.net/images/2019/04/11/hdu.jpg" alt="hdu.jpg"></p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p>题目数量多，来源广，英文题很多，评测系统以及网站本身比较稳定。<br>本身特点大概是很多题有无限组数据，有的题输入数据时的处理比较繁琐，有些题的输出格式也比较繁琐。</p>
+<h2 id="pku（北京大学poj）"><a href="#pku（北京大学poj）" class="headerlink" title="pku（北京大学poj）"></a>pku（北京大学poj）</h2><p><a target="_blank" rel="noopener" href="http://poj.org/" title="北大OJ">http://poj.org/</a></p>
+<p>北大这个OJ平台名气也很出众，对这个平台的印象是几乎全英文题库，我认为美化做的不如hdu。</p>
+<p><img src="https://www.z4a.net/images/2019/04/11/pku.jpg" alt="pku.jpg"></p>
+<h3 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h3><p>不是很熟悉，不做太多评价，大概和hdu类型差不多。</p>
+<h2 id="codevs（）"><a href="#codevs（）" class="headerlink" title="codevs（）"></a>codevs（）</h2><p><a target="_blank" rel="noopener" href="http://www.codevs.cn/" title="codevs">http://www.codevs.cn/</a></p>
+<p>我个人来说特别喜欢这个OJ平台，无论是美工还是题目的选择方面，而且这个平台陪伴了我整个高二，虽然当时没打多少题，但是有着满满的回忆。</p>
+<p><img src="https://www.z4a.net/images/2019/04/11/codevs.jpg" alt="codevs.jpg"></p>
+<h3 id="特点-2"><a href="#特点-2" class="headerlink" title="特点"></a>特点</h3><p>codevs里面按部分给分，并且有的时候会把错误数据显示出来，题目也不少。就是这个平台本身不是很稳定，到现在长时间某些功能无法正常运行，并且对题目的分类做的不好。正如之前所说，这个网站的美化做得很好，并且还自己做了等待提交结果时的小游戏。</p>
+<h2 id="openjudge-noi"><a href="#openjudge-noi" class="headerlink" title="openjudge-noi ()"></a>openjudge-noi ()</h2><p><a target="_blank" rel="noopener" href="http://noi.openjudge.cn/" title="openjudge-noi">http://noi.openjudge.cn/</a></p>
+<p>这个网站也是从高中陪伴我的，openjudge其实是一整个大网站，里面包含很多小组，noi这个小组比较老，也比较规范。有兴趣的读者还可以去openjudge的其他小组看看，相信会有收获。</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/openjudge-noi.jpg" alt="openjudge-noi.jpg"></p>
+<h3 id="特点-3"><a href="#特点-3" class="headerlink" title="特点"></a>特点</h3><p>与codevs不同，这个网站对于题目的类型分类很标准，也有很基础的题目。每一个大块知识点基本都有一个专项练习，比较适合想巩固某一方面能力的同学。但是这个网站基本早已经不再更新了，题目基本已经固定。</p>
+<h2 id="PTA（拼题A）"><a href="#PTA（拼题A）" class="headerlink" title="PTA（拼题A）"></a>PTA（拼题A）</h2><p><a target="_blank" rel="noopener" href="https://pintia.cn/" title="pta">https://pintia.cn/</a></p>
+<p>这个网站是之前打天梯赛的时候集体刷题用的，只用了其中的一个团体程序设计天梯赛的习题集。别的习题集我并不是很感兴趣……</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/pta.jpg" alt="pta.jpg"></p>
+<h3 id="特点-4"><a href="#特点-4" class="headerlink" title="特点"></a>特点</h3><p>因为大多是历届真题，并且根据难度分好得分和等级了，所以团体程序设计天梯赛的习题集还挺好用的，别的习题集不是很清楚。</p>
+<h2 id="nowcoder（牛客网-牛客竞赛）"><a href="#nowcoder（牛客网-牛客竞赛）" class="headerlink" title="nowcoder（牛客网 牛客竞赛）"></a>nowcoder（牛客网 牛客竞赛）</h2><p><a target="_blank" rel="noopener" href="https://ac.nowcoder.com/acm/home" title="nowcoder">https://ac.nowcoder.com/acm/home</a></p>
+<p>牛客网主页的在线编程功能或者说测试功能都很好用，并且牛客网对于求职方面有一定的帮助，我主要进入牛客网的牛客竞赛界面。</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/7d75135bbcf10e2d21bea3db78537aa0.jpg" alt="nowcoder.jpg"></p>
+<h3 id="特点-5"><a href="#特点-5" class="headerlink" title="特点"></a>特点</h3><p>在牛客竞赛的界面既有练习题，也有线上赛。练习题分类也很明确，但是算法种类并没有很多，我平时也并不是在牛客网上找题，主要还是用牛客竞赛的线上赛。大概一周一次，每次等级难度都不同，读者可以根据自己的能力报名，并不收费，报名也可以不参加。</p>
+<h2 id="leetcode（力扣）"><a href="#leetcode（力扣）" class="headerlink" title="leetcode（力扣）"></a>leetcode（力扣）</h2><p><a target="_blank" rel="noopener" href="https://leetcode.com/" title="leetcode e">https://leetcode.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/" title="leetcode c">https://leetcode-cn.com/</a></p>
+<p>分别为力扣网的官网和中国官网，读者用哪个都可以，新发现的一个OJ平台，最近还将举办一个力扣杯的比赛。</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/leetcode-e.jpg" alt="leetcode-e.jpg"></p>
+<p><img src="https://www.z4a.net/images/2019/04/12/leetcode-c.jpg" alt="leetcode-c.jpg"></p>
+<h3 id="特点-6"><a href="#特点-6" class="headerlink" title="特点"></a>特点</h3><p>题目数量不算多，但精度还行，分类做的比较完整。有自己的中英文切换，有积分兑换系统，美工做的也挺好的。而且在力扣阅读界面拥有官方给出的一些题目的多种解法，学习和测验效果也不错。</p>
+<h2 id="lintcode（领扣）"><a href="#lintcode（领扣）" class="headerlink" title="lintcode（领扣）"></a>lintcode（领扣）</h2><p><a target="_blank" rel="noopener" href="https://www.lintcode.com/" title="lintcode">https://www.lintcode.com/</a></p>
+<p>也是一个新发现的OJ平台，具体怎么样还没有试过。</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/lintcode.jpg" alt="lintcode.jpg"></p>
+<h3 id="特点-7"><a href="#特点-7" class="headerlink" title="特点"></a>特点</h3><p>貌似有针对人工智能的训练题，针对算法的题分类一般，题量也一般。（具体我也没好好看……）</p>
+<h2 id="luogu（洛谷）"><a href="#luogu（洛谷）" class="headerlink" title="luogu（洛谷）"></a>luogu（洛谷）</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.org/" title="luogu">https://www.luogu.org/</a></p>
+<p>一个针对noip的网站，大学也有用处。</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/6369b221bc143a42ddd18dff3c1c0ae5.jpg" alt="luogu.jpg"></p>
+<h3 id="特点-8"><a href="#特点-8" class="headerlink" title="特点"></a>特点</h3><p>题量还挺足的，美工也偏软风，分类做的也不错。有兴趣可以常用。特别的是貌似学习了打怪人物制……</p>
+<h2 id="vijos（VJ）"><a href="#vijos（VJ）" class="headerlink" title="vijos（VJ）"></a>vijos（VJ）</h2><p><a target="_blank" rel="noopener" href="https://vijos.org/" title="VJ">https://vijos.org/</a></p>
+<p>一开始总把这个网站和洛谷搞混，这些日子认清了……</p>
+<p><img src="https://www.z4a.net/images/2019/04/12/vijos.jpg" alt="vijos.jpg"></p>
+<h3 id="特点-9"><a href="#特点-9" class="headerlink" title="特点"></a>特点</h3><p>美工做的挺好的，题量中上，分类其实也不错。这个网站我很有好感，可以作为常用网站平时刷刷题。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>另外还有几个网站新近找出来的，有的是国外的网站，因为不太了解，所以我仅在这里提出网址，有兴趣的读者可以自选看看。</p>
+<p><a target="_blank" rel="noopener" href="https://www.jisuanke.com/" title="计蒜客">https://www.jisuanke.com/</a><br>计蒜客</p>
+<p><a target="_blank" rel="noopener" href="http://www.acmcoder.com/index" title="赛码网">http://www.acmcoder.com/index</a><br>赛码网</p>
+<p><a target="_blank" rel="noopener" href="http://uoj.ac/" title="uoj">http://uoj.ac/</a><br>uoj</p>
+<p><a target="_blank" rel="noopener" href="https://uva.onlinejudge.org/" title="uva">https://uva.onlinejudge.org/</a><br>uva（国外）</p>
+<p>或许未完待续……</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://www.unknown9t.com">Maple</a></p><p> <span>Link:  </span><a href="http://www.unknown9t.com/2022/04/29/%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8OJ%E5%B9%B3%E5%8F%B0/">http://www.unknown9t.com/2022/04/29/%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8OJ%E5%B9%B3%E5%8F%B0/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2022/04/29/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/" title="二分查找"><span>< PreviousPost</span><br><span class="prevTitle">二分查找</span></a><a class="nextSlogan" href="/2022/04/29/%E8%93%9D%E6%A1%A5%E6%9D%AF%E4%B8%8E%E5%A4%A9%E6%A2%AF%E8%B5%9B%E8%B5%9B%E5%90%8E%E6%84%9F%E5%8F%97/" title="蓝桥杯和天梯赛赛后感受"><span>NextPost ></span><br><span class="nextTitle">蓝桥杯和天梯赛赛后感受</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hdu%EF%BC%88%E6%9D%AD%E5%B7%9E%E7%94%B5%E5%AD%90%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">hdu（杭州电子科技大学）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9"><span class="toc-number">2.1.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pku%EF%BC%88%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6poj%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">pku（北京大学poj）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#codevs%EF%BC%88%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">codevs（）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-2"><span class="toc-number">2.3.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#openjudge-noi"><span class="toc-number">2.4.</span> <span class="toc-text">openjudge-noi ()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-3"><span class="toc-number">2.4.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PTA%EF%BC%88%E6%8B%BC%E9%A2%98A%EF%BC%89"><span class="toc-number">2.5.</span> <span class="toc-text">PTA（拼题A）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-4"><span class="toc-number">2.5.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nowcoder%EF%BC%88%E7%89%9B%E5%AE%A2%E7%BD%91-%E7%89%9B%E5%AE%A2%E7%AB%9E%E8%B5%9B%EF%BC%89"><span class="toc-number">2.6.</span> <span class="toc-text">nowcoder（牛客网 牛客竞赛）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-5"><span class="toc-number">2.6.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#leetcode%EF%BC%88%E5%8A%9B%E6%89%A3%EF%BC%89"><span class="toc-number">2.7.</span> <span class="toc-text">leetcode（力扣）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-6"><span class="toc-number">2.7.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lintcode%EF%BC%88%E9%A2%86%E6%89%A3%EF%BC%89"><span class="toc-number">2.8.</span> <span class="toc-text">lintcode（领扣）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-7"><span class="toc-number">2.8.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#luogu%EF%BC%88%E6%B4%9B%E8%B0%B7%EF%BC%89"><span class="toc-number">2.9.</span> <span class="toc-text">luogu（洛谷）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-8"><span class="toc-number">2.9.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vijos%EF%BC%88VJ%EF%BC%89"><span class="toc-number">2.10.</span> <span class="toc-text">vijos（VJ）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9-9"><span class="toc-number">2.10.1.</span> <span class="toc-text">特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-number">2.11.</span> <span class="toc-text">其他</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
